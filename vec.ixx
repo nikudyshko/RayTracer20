@@ -1,13 +1,49 @@
 export module vec; 
 
-template<typename T, size_t size = 4> 
-class Vec 
+template<typename T>
+struct Vec 
 { 
-public: 
 	union 
 	{ 
-		T arr_[size]; 
-		T x, y, z, w; 
-		T r, g, b, a; 
+		T vec_[4]; 
+		struct 
+		{ 
+			T x, y, z, w; 
+		} 
+		struct 
+		{ 
+			T r, g, b, a; 
+		}
+	} 
+
+	Vec() : 
+		x{T()}, y{T()}, z{T()}, w{T()} {} 
+
+	Vec(T v) : 
+		x{v}, y{v}, z{v}, w{v} {} 
+
+	Vec(T x_, T y_, T z_, w_) : 
+		x{x_}, y{y_}, z{z_}, w{w_} {} 
+
+	Vec(const Vec<T>& v) : 
+		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
+
+	T& operator[](const size_t i) 
+	{ 
+		assert(i < 4); 
+		return vec_[i]; 
+	} 
+
+	const T& operator[](const size_t i) 
+	{ 
+		assert(i < 4); 
+		return vec_[i]; 
+	} 
+
+	T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
+	Vec<T>& normalize(T scale = static_cst<T>(1)) 
+	{ 
+		*this = scale*(*this)/norm(); 
+		return *this; 
 	}
 }; 
