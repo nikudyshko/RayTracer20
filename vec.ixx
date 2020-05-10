@@ -1,7 +1,7 @@
 export module vec; 
 
-template<typename T>
-struct Vec 
+template<typename T> 
+export struct Vec 
 { 
 	union 
 	{ 
@@ -45,5 +45,45 @@ struct Vec
 	{ 
 		*this = scale*(*this)/norm(); 
 		return *this; 
-	}
+	} 
+
+	Vec<T>& operator=(const Vec<T>& rhs) 
+	{ 
+		x = rhs.x; 
+		y = rhs.y; 
+		z = rhs.z; 
+		w = rhs.w; 
+		return *this; 
+	} 
+
+	Vec<T>& operator+=(const Vec<T>& rhs) 
+	{ 
+		x += rhs.x; 
+		y += rhs.y; 
+		z += rhs.z; 
+		w += rhs.w; 
+		return *this; 
+	} 
+
+	Vec<T>& operator-=(const Vec<T>& rhs) 
+	{ 
+		x -= rhs.x; 
+		y -= rhs.y; 
+		z -= rhs.z; 
+		w -= rhs.w; 
+		return *this; 
+	} 
 }; 
+
+template<typename T> 
+T operator*(const Vec<T>& lhs, const Vec<T>& rhs) 
+{ 
+	return lhs.x*rhs.x + lhs.y*rhs.y 
+		   lhs.z*rhs.z + lhs.w*rhs.w; 
+} 
+
+template<typename T> 
+T operator+(const Vec<T>& lhs, const Vec<T>& rhs) 
+{ 
+
+}

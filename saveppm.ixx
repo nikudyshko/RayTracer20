@@ -1,12 +1,12 @@
 export module saveppm; 
 
-#include <iostream> 
-#include <fstream> 
+import std.core; 
+import vec; 
 
 export void save_ppm( 
 	size_t width, 
 	size_t height, 
-	const std::vector<Vec3f>& framebuffer
+	const std::vector<Vec>& framebuffer 
 ) 
 { 
 	std::ofstream output; 
