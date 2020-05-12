@@ -1,6 +1,6 @@
 export module vec; 
 
-template<typename T> 
+template<typename T = float> 
 export struct Vec 
 { 
 	union 
