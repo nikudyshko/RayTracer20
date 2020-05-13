@@ -16,62 +16,89 @@ export struct Vec
 		}
 	} 
 
-	inline Vec() : 
+	inline 
+	Vec() : 
 		x{T()}, y{T()}, z{T()}, w{T()} {} 
 
-	inline Vec(T v) : 
-		x{v}, y{v}, z{v}, w{v} {} 
+	template<typename U = T> 
+	inline 
+	Vec(U v) : 
+		x{static_cast<T>(v)}, 
+		y{static_cast<T>(v)}, 
+		z{static_cast<T>(v)}, 
+		w{static_cast<T>(v)} {} 
 
-	inline Vec(T x_, T y_, T z_, T w_) : 
-		x{x_}, y{y_}, z{z_}, w{w_} {} 
+	template<typename U = T> 
+	inline 
+	Vec(U x_, U y_, U z_, U w_) : 
+		x{static_cast<T>(x_)}, 
+		y{static_cast<T>(y_)}, 
+		z{static_cast<T>(z_)}, 
+		w{static_cast<T>(w_)} {} 
 
-	inline Vec(const Vec<T>& v) : 
-		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
+	template<typename U = T> 
+	inline 
+	Vec(const Vec<U>& v) : 
+		x{static_cast<T>(v.x)}, 
+		y{static_cast<T>(v.y)}, 
+		z{static_cast<T>(v.z)}, 
+		w{static_cast<T>(v.w)} {} 
 
-	inline T& operator[](const size_t i) 
+	inline 
+	T& operator[](const size_t i) 
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
-	inline const T& operator[](const size_t i) 
+	inline 
+	const T& operator[](const size_t i) 
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
-	inline T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
+	inline 
+	T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
 
-	inline Vec<T>& normalize(T scale = static_cast<T>(1)) 
+	template<typename U = T> 
+	inline 
+	Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
-		*this = scale*(*this)/length(); 
+		T s = static_cast<T>(scale)/length(); 
+		return Vec<T>(x / s, y / s, z / s, w / s); 
+	} 
+
+	template<typename U = T> 
+	inline 
+	Vec<T>& operator=(const Vec<U>& rhs) 
+	{ 
+		x = static_cast<T>(rhs.x); 
+		y = static_cast<T>(rhs.y); 
+		z = static_cast<T>(rhs.z); 
+		w = static_cast<T>(rhs.w); 
 		return *this; 
 	} 
 
-	inline Vec<T>& operator=(const Vec<T>& rhs) 
+	template<typename U = T> 
+	inline 
+	Vec<T>& operator+=(const Vec<U>& rhs) 
 	{ 
-		x = rhs.x; 
-		y = rhs.y; 
-		z = rhs.z; 
-		w = rhs.w; 
+		x += static_cast<T>(rhs.x); 
+		y += static_cast<T>(rhs.y); 
+		z += static_cast<T>(rhs.z); 
+		w += static_cast<T>(rhs.w); 
 		return *this; 
 	} 
 
-	inline Vec<T>& operator+=(const Vec<T>& rhs) 
+	template<typename U = T> 
+	inline 
+	Vec<T>& operator-=(const Vec<U>& rhs) 
 	{ 
-		x += rhs.x; 
-		y += rhs.y; 
-		z += rhs.z; 
-		w += rhs.w; 
-		return *this; 
-	} 
-
-	inline Vec<T>& operator-=(const Vec<T>& rhs) 
-	{ 
-		x -= rhs.x; 
-		y -= rhs.y; 
-		z -= rhs.z; 
-		w -= rhs.w; 
+		x -= static_cast<T>(rhs.x); 
+		y -= static_cast<T>(rhs.y); 
+		z -= static_cast<T>(rhs.z); 
+		z -= static_cast<T>(rhs.w); 
 		return *this; 
 	} 
 }; 
