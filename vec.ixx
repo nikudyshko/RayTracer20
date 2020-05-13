@@ -16,38 +16,39 @@ export struct Vec
 		}
 	} 
 
-	Vec() : 
+	inline Vec() : 
 		x{T()}, y{T()}, z{T()}, w{T()} {} 
 
-	Vec(T v) : 
+	inline Vec(T v) : 
 		x{v}, y{v}, z{v}, w{v} {} 
 
-	Vec(T x_, T y_, T z_, w_) : 
+	inline Vec(T x_, T y_, T z_, T w_) : 
 		x{x_}, y{y_}, z{z_}, w{w_} {} 
 
-	Vec(const Vec<T>& v) : 
+	inline Vec(const Vec<T>& v) : 
 		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
 
-	T& operator[](const size_t i) 
+	inline T& operator[](const size_t i) 
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
-	const T& operator[](const size_t i) 
+	inline const T& operator[](const size_t i) 
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
-	T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
-	Vec<T>& normalize(T scale = static_cst<T>(1)) 
+	inline T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
+
+	inline Vec<T>& normalize(T scale = static_cast<T>(1)) 
 	{ 
-		*this = scale*(*this)/norm(); 
+		*this = scale*(*this)/length(); 
 		return *this; 
 	} 
 
-	Vec<T>& operator=(const Vec<T>& rhs) 
+	inline Vec<T>& operator=(const Vec<T>& rhs) 
 	{ 
 		x = rhs.x; 
 		y = rhs.y; 
@@ -56,7 +57,7 @@ export struct Vec
 		return *this; 
 	} 
 
-	Vec<T>& operator+=(const Vec<T>& rhs) 
+	inline Vec<T>& operator+=(const Vec<T>& rhs) 
 	{ 
 		x += rhs.x; 
 		y += rhs.y; 
@@ -65,7 +66,7 @@ export struct Vec
 		return *this; 
 	} 
 
-	Vec<T>& operator-=(const Vec<T>& rhs) 
+	inline Vec<T>& operator-=(const Vec<T>& rhs) 
 	{ 
 		x -= rhs.x; 
 		y -= rhs.y; 
@@ -76,14 +77,14 @@ export struct Vec
 }; 
 
 template<typename T> 
-T operator*(const Vec<T>& lhs, const Vec<T>& rhs) 
+inline T operator*(const Vec<T>& lhs, const Vec<T>& rhs) 
 { 
-	return lhs.x*rhs.x + lhs.y*rhs.y 
+	return lhs.x*rhs.x + lhs.y*lhs.y 
 		   lhs.z*rhs.z + lhs.w*rhs.w; 
 } 
 
 template<typename T> 
-T operator+(const Vec<T>& lhs, const Vec<T>& rhs) 
+inline T operator+(const Vec<T>& lhs, const Vec<T>& rhs) 
 { 
 
 }
