@@ -1,7 +1,24 @@
 export module vec; 
 
+template<typename T, typename U> 
+concept castable = requires(U v) 
+{ { static_cast<T>(v) } -> T; }; 
+
+template<typename T> 
+concept arithm_ops = requires(T a, T b) 
+{ 
+	{ a + b } -> T; 
+	{ a - b } -> T; 
+	{ a * b } -> T; 
+	{ a / b } -> T; 
+}; 
+
+template<typename T> 
+concept rootable = requires(T v) 
+{ { std::sqrt(v) } -> T; }; 
+
 template<typename T = float> 
-export struct Vec 
+requires default_initializable<T> && arithm_ops<T> && rootable<T> 
 { 
 	union 
 	{ 
@@ -21,14 +38,16 @@ export struct Vec
 		x{T()}, y{T()}, z{T()}, w{T()} {} 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec(U v) : 
 		x{static_cast<T>(v)}, 
 		y{static_cast<T>(v)}, 
 		z{static_cast<T>(v)}, 
-		w{static_cast<T>(v)} {} 
+		w{static_Cast<T>(v)} {} 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec(U x_, U y_, U z_, U w_) : 
 		x{static_cast<T>(x_)}, 
@@ -37,6 +56,7 @@ export struct Vec
 		w{static_cast<T>(w_)} {} 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec(const Vec<U>& v) : 
 		x{static_cast<T>(v.x)}, 
@@ -59,17 +79,19 @@ export struct Vec
 	} 
 
 	inline 
-	T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
+	T length() { return std::sqrt(x * x + y * y + z * z + w * w); } 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
-		T s = static_cast<T>(scale)/length(); 
+		T s = static_cast<T>(scale) / length(); 
 		return Vec<T>(x / s, y / s, z / s, w / s); 
 	} 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec<T>& operator=(const Vec<U>& rhs) 
 	{ 
@@ -81,6 +103,7 @@ export struct Vec
 	} 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec<T>& operator+=(const Vec<U>& rhs) 
 	{ 
@@ -92,13 +115,14 @@ export struct Vec
 	} 
 
 	template<typename U = T> 
+	requires castable<T, U> 
 	inline 
 	Vec<T>& operator-=(const Vec<U>& rhs) 
 	{ 
 		x -= static_cast<T>(rhs.x); 
 		y -= static_cast<T>(rhs.y); 
 		z -= static_cast<T>(rhs.z); 
-		z -= static_cast<T>(rhs.w); 
+		w -= static_cast<T>(rhs.w); 
 		return *this; 
 	} 
 }; 
