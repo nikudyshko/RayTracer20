@@ -79,15 +79,15 @@ requires default_initializable<T> && arithm_ops<T> && rootable<T>
 	} 
 
 	inline 
-	T length() { return std::sqrt(x * x + y * y + z * z + w * w); } 
+	T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
 	inline 
 	Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
-		T s = static_cast<T>(scale) / length(); 
-		return Vec<T>(x / s, y / s, z / s, w / s); 
+		T s = static_cast<T>(scale)/length(); 
+		return Vec<T>(x/s, y/s, z/s, w/s); 
 	} 
 
 	template<typename U = T> 
@@ -127,15 +127,37 @@ requires default_initializable<T> && arithm_ops<T> && rootable<T>
 	} 
 }; 
 
-template<typename T> 
-inline T operator*(const Vec<T>& lhs, const Vec<T>& rhs) 
+template<typename T, typename U = T> 
+inline 
+auto operator*(const Vec<T>& lhs, const Vec<U>& rhs) 
 { 
-	return lhs.x*rhs.x + lhs.y*lhs.y 
+	return lhs.x*rhs.x + lhs.y*lhs.y + 
 		   lhs.z*rhs.z + lhs.w*rhs.w; 
 } 
 
-template<typename T> 
-inline T operator+(const Vec<T>& lhs, const Vec<T>& rhs) 
+template<typename T, typename U = T> 
+inline 
+auto operator+(const Vec<T>& lhs, const Vec<U>& rhs) 
 { 
+	return Vec(lhs.x + rhs.x, lhs.y + rhs.y, 
+			   lhs.z + rhs.z, lhs.w + rhs.w); 
+} 
 
+template<typename T, typename U = T> 
+inline 
+auto operator-(const Vec<T>& lhs, const Vec<U>& rhs) 
+{ 
+	return Vec(lhs.x - rhs.x, lhs.y - rhs.y, 
+			   lhs.z - rhs.z, lhs.w - rhs.w); 
+} 
+
+template<typename T, typename U = T> 
+inline 
+auto& operator^(const Vec<T>& lhs, const Vec<U>& rhs) 
+{ 
+	auto x = lhs.y*rhs.z - lhs.z*rhs.y; 
+	auto y = lhs.z*rhs.x - lhs.x*rhs.z; 
+	auto z = lhs.x*rhs.y - lhs.y*rhs.z; 
+	auto w = 0; 
+	return Vec(x, y, z, w); 
 }
