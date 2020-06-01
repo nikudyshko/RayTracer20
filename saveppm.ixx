@@ -3,10 +3,11 @@ export module saveppm;
 import std.core; 
 import vec; 
 
-export void save_ppm( 
+export template<typename T> 
+void save_ppm( 
 	size_t width, 
 	size_t height, 
-	const std::vector<Vec>& framebuffer 
+	const std::vector<Vec<T>>& framebuffer 
 ) 
 { 
 	std::ofstream output; 
