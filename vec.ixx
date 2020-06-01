@@ -1,3 +1,9 @@
+module; 
+
+#include <cassert> 
+
+import std.core; 
+
 export module vec; 
 
 template<typename T, typename U> 
@@ -33,8 +39,9 @@ template<typename T>
 concept rootable = requires(T v) 
 { { std::sqrt(v) } -> T; }; 
 
-template<typename T = float> 
+export template<typename T = float> 
 requires default_initializable<T> && sim_arithm<T> && rootable<T> 
+class Vec
 {  
 	union 
 	{ 
@@ -42,12 +49,12 @@ requires default_initializable<T> && sim_arithm<T> && rootable<T>
 		struct 
 		{ 
 			T x, y, z, w; 
-		} 
+		}; 
 		struct 
 		{ 
 			T r, g, b, a; 
-		}
-	} 
+		}; 
+	}; 
 
 	inline 
 	Vec() : 
@@ -143,20 +150,18 @@ requires default_initializable<T> && sim_arithm<T> && rootable<T>
 	} 
 }; 
 
-template<typename T, typename U> 
+export template<typename T, typename U> 
 requires mut_arithm<T, U> 
-inline 
-auto operator*(const Vec<T>& lhs, const Vec<U>& rhs) -> decltype(lhs.x*rhs.x) 
+inline auto operator*(const Vec<T>& lhs, const Vec<U>& rhs) -> decltype(lhs.x*rhs.x) 
 { 
 	return lhs.x*rhs.x + lhs.y*rhs.y + 
 		   lhs.z*rhs.z + lhs.w*rhs.w; 
 } 
 
-template<typename T, typename U> 
+export template<typename T, typename U> 
 requires mut_arithm<T, U> && 
-		 requires(T t, U u) default_initializable<decltype(t*u)> 
-inline 
-auto operator^(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
+		 requires(T t, U u) { default_initializable<decltype(t*u)>; } 
+inline auto operator^(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
 { 
 	using V = decltype(lhs.x*rhs.y); 
 	V x = lhs.y*rhs.z - lhs.z*rhs.y; 
@@ -166,22 +171,27 @@ auto operator^(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.y
 	return Vec<V>(x, y, z, w); 
 } 
 
-template<typename T, typename U> 
+export template<typename T, typename U> 
 requires mut_arithm<T, U> 
-inline 
-auto operator+(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x + rhs.x)> 
+inline auto operator+(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x + rhs.x)> 
 { 
 	using V = decltype(lhs.x + rhs.x); 
 	return Vec<V>(lhs.x + rhs.x, lhs.y + rhs.y, 
 				  lhs.z + rhs.z, lhs.w + rhs.w); 
 } 
 
-template<typename T, typename U> 
+export template<typename T, typename U> 
 requires mut_arithm<T, U> 
-inline 
-auto operator-(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
+inline auto operator-(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
 { 
 	using V = decltype(lhs.x - rhs.x); 
 	return Vec<V>(lhs.x - rhs.x, lhs.y - rhs.y, 
 				  lhs.z - rhs.z, lhs.w - rhs.w); 
 } 
+
+export template<typename T> 
+inline std::ostream& operator<<(std::ostream& out, const Vec<T>& v) 
+{ 
+	out << '[' << v.x << ', ' << v.y << ', ' << v.z << ', ' << v.w << "]\n"; 
+	return out; 
+}
