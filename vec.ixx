@@ -30,19 +30,20 @@ template<typename T>
 concept sim_arithm = requires(T a, T b) 
 { 
 	{ a + b } -> T; 
-	{ a - b } -> T; 
-	{ a * b } -> T; 
-	{ a / b } -> T; 
+	{ a - b } -> T;  
+	{ a * b } -> T;  
+	{ a / b } -> T;  
 }; 
 
 template<typename T> 
 concept rootable = requires(T v) 
-{ { std::sqrt(v) } -> T; }; 
+{ { std::sqrt(v) }; }; 
 
 export template<typename T = float> 
-requires default_initializable<T> && sim_arithm<T> && rootable<T> 
+requires /*default_initializable<T> &&*/ sim_arithm<T> && rootable<T> 
 class Vec
 {  
+public: 
 	union 
 	{ 
 		T vec_[4]; 
@@ -58,7 +59,7 @@ class Vec
 
 	inline 
 	Vec() : 
-		x{T()}, y{T()}, z{T()}, w{T()} {} 
+		x{T()}, y{T()}, z{T()}, w{T()} { std::cout << "Default" << x << y << z << w << '\n'; } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -67,7 +68,7 @@ class Vec
 		x{static_cast<T>(v)}, 
 		y{static_cast<T>(v)}, 
 		z{static_cast<T>(v)}, 
-		w{static_cast<T>(v)} {} 
+		w{static_cast<T>(v)} { std::cout << "Single" << x << y << z << w << '\n'; } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -76,7 +77,7 @@ class Vec
 		x{static_cast<T>(x_)}, 
 		y{static_cast<T>(y_)}, 
 		z{static_cast<T>(z_)}, 
-		w{static_cast<T>(w_)} {} 
+		w{static_cast<T>(w_)} { std::cout << "Multiple" << x << y << z << w << '\n'; } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -85,7 +86,7 @@ class Vec
 		x{static_cast<T>(v.x)}, 
 		y{static_cast<T>(v.y)}, 
 		z{static_cast<T>(v.z)}, 
-		w{static_cast<T>(v.w)} {} 
+		w{static_cast<T>(v.w)} { std::cout << "From Vec" << x << y << z << w << '\n'; } 
 
 	inline 
 	T& operator[](const size_t i) 
@@ -95,14 +96,14 @@ class Vec
 	} 
 
 	inline 
-	const T& operator[](const size_t i) 
+	const T& operator[](const size_t i) const
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
 	inline 
-	T length() { return std::sqrt(x*x + y*y + z*z + w*w); } 
+	T length() const { return std::sqrt(x*x + y*y + z*z + w*w); } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -148,6 +149,14 @@ class Vec
 		w -= static_cast<T>(rhs.w); 
 		return *this; 
 	} 
+
+	//friend inline std::ostream& operator<<(std::ostream& out, const Vec<T>& v); 
+
+	friend inline std::ostream& operator<<(std::ostream& out, const Vec<T>& v) 
+	{ 
+		out << '[' << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ']'; 
+		return out; 
+	}  
 }; 
 
 export template<typename T, typename U> 
@@ -192,6 +201,6 @@ inline auto operator-(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.
 export template<typename T> 
 inline std::ostream& operator<<(std::ostream& out, const Vec<T>& v) 
 { 
-	out << '[' << v.x << ', ' << v.y << ', ' << v.z << ', ' << v.w << "]\n"; 
+	out << '[' << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ']'; 
 	return out; 
-}
+}  
