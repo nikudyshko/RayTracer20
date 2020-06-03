@@ -40,10 +40,9 @@ concept rootable = requires(T v)
 { { std::sqrt(v) }; }; 
 
 export template<typename T = float> 
-requires /*default_initializable<T> &&*/ sim_arithm<T> && rootable<T> 
-class Vec
+requires std::default_initializable<T> && sim_arithm<T> && rootable<T> 
+struct Vec 
 {  
-public: 
 	union 
 	{ 
 		T vec_[4]; 
@@ -57,14 +56,15 @@ public:
 		}; 
 	}; 
 
-	inline 
-	Vec() : 
+	inline Vec() : 
 		x{T()}, y{T()}, z{T()}, w{T()} { std::cout << "Default" << x << y << z << w << '\n'; } 
+
+	inline Vec(const Vec<T>& v) : 
+		x{v.x}, y{v.y}, z{v.z}, w{v.w} { std::cout << "From Sim Vec" << x << y << z << w << '\n'; } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec(U v) : 
+	inline Vec(U v) : 
 		x{static_cast<T>(v)}, 
 		y{static_cast<T>(v)}, 
 		z{static_cast<T>(v)}, 
@@ -72,8 +72,7 @@ public:
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec(U x_, U y_, U z_, U w_ = U()) : 
+	inline Vec(U x_, U y_, U z_, U w_ = U()) : 
 		x{static_cast<T>(x_)}, 
 		y{static_cast<T>(y_)}, 
 		z{static_cast<T>(z_)}, 
@@ -81,34 +80,29 @@ public:
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec(const Vec<U>& v) : 
+	inline Vec(const Vec<U>& v) : 
 		x{static_cast<T>(v.x)}, 
 		y{static_cast<T>(v.y)}, 
 		z{static_cast<T>(v.z)}, 
-		w{static_cast<T>(v.w)} { std::cout << "From Vec" << x << y << z << w << '\n'; } 
+		w{static_cast<T>(v.w)} { std::cout << "From Mut Vec" << x << y << z << w << '\n'; } 
 
-	inline 
-	T& operator[](const size_t i) 
+	inline T& operator[](const size_t i) 
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
-	inline 
-	const T& operator[](const size_t i) const
+	inline const T& operator[](const size_t i) const 
 	{ 
 		assert(i < 4); 
 		return vec_[i]; 
 	} 
 
-	inline 
-	T length() const { return std::sqrt(x*x + y*y + z*z + w*w); } 
+	inline T length() const { return std::sqrt(x*x + y*y + z*z + w*w); } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec<T> normalize(U scale = static_cast<U>(1)) 
+	inline Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
 		T s = static_cast<T>(scale)/length(); 
 		return Vec<T>(x/s, y/s, z/s, w/s); 
@@ -116,8 +110,7 @@ public:
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec<T>& operator=(const Vec<U>& rhs) 
+	inline Vec<T>& operator=(const Vec<U>& rhs) 
 	{ 
 		x = static_cast<T>(rhs.x); 
 		y = static_cast<T>(rhs.y); 
@@ -128,8 +121,7 @@ public:
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec<T>& operator+=(const Vec<U>& rhs) 
+	inline Vec<T>& operator+=(const Vec<U>& rhs) 
 	{ 
 		x += static_cast<T>(rhs.x); 
 		y += static_cast<T>(rhs.y); 
@@ -140,8 +132,7 @@ public:
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline 
-	Vec<T>& operator-=(const Vec<U>& rhs) 
+	inline Vec<T>& operator-=(const Vec<U>& rhs) 
 	{ 
 		x -= static_cast<T>(rhs.x); 
 		y -= static_cast<T>(rhs.y); 
@@ -149,14 +140,6 @@ public:
 		w -= static_cast<T>(rhs.w); 
 		return *this; 
 	} 
-
-	//friend inline std::ostream& operator<<(std::ostream& out, const Vec<T>& v); 
-
-	friend inline std::ostream& operator<<(std::ostream& out, const Vec<T>& v) 
-	{ 
-		out << '[' << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ']'; 
-		return out; 
-	}  
 }; 
 
 export template<typename T, typename U> 
@@ -169,13 +152,13 @@ inline auto operator*(const Vec<T>& lhs, const Vec<U>& rhs) -> decltype(lhs.x*rh
 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> && 
-		 requires(T t, U u) { default_initializable<decltype(t*u)>; } 
+		 requires(T t, U u) { std::default_initializable<decltype(t*u)>; } 
 inline auto operator^(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
 { 
 	using V = decltype(lhs.x*rhs.y); 
 	V x = lhs.y*rhs.z - lhs.z*rhs.y; 
 	V y = lhs.z*rhs.x - lhs.x*rhs.z; 
-	V z = lhs.z*rhs.y - lhs.y*rhs.x; 
+	V z = lhs.x*rhs.y - lhs.y*rhs.x; 
 	V w = V(); 
 	return Vec<V>(x, y, z, w); 
 } 
