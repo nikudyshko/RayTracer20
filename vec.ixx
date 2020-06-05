@@ -42,7 +42,7 @@ concept rootable = requires(T v)
 export template<typename T = float> 
 requires std::default_initializable<T> && sim_arithm<T> && rootable<T> 
 struct Vec 
-{  
+{ 
 	union 
 	{ 
 		T vec_[4]; 
@@ -58,6 +58,17 @@ struct Vec
 
 	inline Vec() : 
 		x{T()}, y{T()}, z{T()}, w{T()} { std::cout << "Default" << x << y << z << w << '\n'; } 
+
+	inline explicit Vec(std::initializer_list<T> l) 
+	{ 
+		assert(l.size() == 4); 
+		auto it = l.begin(); 
+		x = *it; 
+		y = *(it + 1); 
+		z = *(it + 2); 
+		w = *(it + 3); 
+		std::cout << "Sim Init List" << x << y << z << w << '\n'; 
+	}  
 
 	inline Vec(const Vec<T>& v) : 
 		x{v.x}, y{v.y}, z{v.z}, w{v.w} { std::cout << "From Sim Vec" << x << y << z << w << '\n'; } 
@@ -77,6 +88,19 @@ struct Vec
 		y{static_cast<T>(y_)}, 
 		z{static_cast<T>(z_)}, 
 		w{static_cast<T>(w_)} { std::cout << "Multiple" << x << y << z << w << '\n'; } 
+
+	template<typename U = T> 
+	requires castable<T, U> 
+	inline explicit Vec(std::initializer_list<U> l) 
+	{ 
+		assert(l.size() == 4); 
+		auto it = l.begin(); 
+		x = static_cast<T>(*it); 
+		y = static_cast<T>(*(it + 1)); 
+		z = static_cast<T>(*(it + 2)); 
+		w = static_cast<T>(*(it + 3)); 
+		std::cout << "Mut Init List" << x << y << z << w << '\n'; 
+	}
 
 	template<typename U = T> 
 	requires castable<T, U> 
