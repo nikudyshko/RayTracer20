@@ -27,10 +27,12 @@ public:
 			return normal; 
 		else 
 		{ 
-			Vec<T> v1 = p2 - p1; 
-			Vec<T> v2 = p3 - p2; 
+			Vec<T> v1 = vertices[1] - vertices[0]; 
+			Vec<T> v2 = vertices[2] - vertices[1]; 
+
+			has_normal = true; 
 			normal = (v1 ^ v2).normalize(); 
 			return normal; 
-		}
-	}
+		} 
+	} 
 }; 
