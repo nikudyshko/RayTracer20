@@ -61,12 +61,28 @@ struct Vec
 
 	inline explicit Vec(std::initializer_list<T> l) 
 	{ 
-		assert(l.size() == 4); 
+		assert((l.size() == 1) || (l.size() >= 3)); 
 		auto it = l.begin(); 
-		x = *it; 
-		y = *(it + 1); 
-		z = *(it + 2); 
-		w = *(it + 3); 
+		if (l.size() == 1) 
+		{ 
+			x = y = z = w = *it; 
+		} 
+		else 
+			if (l.size() == 3) 
+			{ 
+				x = *it; 
+				y = *(it + 1); 
+				z = *(it + 2); 
+				w = T(); 
+			} 
+			else 
+				if (l.size() == 4) 
+				{ 
+					x = *it; 
+					y = *(it + 1); 
+					z = *(it + 2); 
+					w = *(it + 3); 
+				} 
 		std::cout << "Sim Init List" << x << y << z << w << '\n'; 
 	}  
 
@@ -93,12 +109,28 @@ struct Vec
 	requires castable<T, U> 
 	inline explicit Vec(std::initializer_list<U> l) 
 	{ 
-		assert(l.size() == 4); 
+		assert((l.size() == 1) || (l.size() >= 3)); 
 		auto it = l.begin(); 
-		x = static_cast<T>(*it); 
-		y = static_cast<T>(*(it + 1)); 
-		z = static_cast<T>(*(it + 2)); 
-		w = static_cast<T>(*(it + 3)); 
+		if (l.size() == 1) 
+		{ 
+			x = y = z = w = *it; 
+		} 
+		else 
+			if (l.size() == 3) 
+			{ 
+				x = *it; 
+				y = *(it + 1); 
+				z = *(it + 2); 
+				w = T(); 
+			} 
+			else 
+				if (l.size() == 4) 
+				{ 
+					x = *it; 
+					y = *(it + 1); 
+					z = *(it + 2); 
+					w = *(it + 3); 
+				} 
 		std::cout << "Mut Init List" << x << y << z << w << '\n'; 
 	}
 
