@@ -57,15 +57,15 @@ struct Vec
 	}; 
 
 	inline Vec() : 
-		x{T()}, y{T()}, z{T()}, w{T()} { std::cout << "Default" << x << y << z << w << '\n'; } 
+		x{T()}, y{T()}, z{T()}, w{T()} { /*std::cout << "Default" << x << y << z << w << '\n';*/ } 
 
-	inline explicit Vec(std::initializer_list<T> l) 
+	inline Vec(std::initializer_list<T> l) 
 	{ 
 		assert((l.size() == 1) || (l.size() >= 3)); 
 		auto it = l.begin(); 
 		if (l.size() == 1) 
 		{ 
-			x = y = z = w = *it; 
+			x = y = z = w = *it;  
 		} 
 		else 
 			if (l.size() == 3) 
@@ -83,11 +83,11 @@ struct Vec
 					z = *(it + 2); 
 					w = *(it + 3); 
 				} 
-		std::cout << "Sim Init List" << x << y << z << w << '\n'; 
+//		std::cout << "Sim Init List" << x << y << z << w << '\n'; 
 	}  
 
 	inline Vec(const Vec<T>& v) : 
-		x{v.x}, y{v.y}, z{v.z}, w{v.w} { std::cout << "From Sim Vec" << x << y << z << w << '\n'; } 
+		x{v.x}, y{v.y}, z{v.z}, w{v.w} { /*std::cout << "From Sim Vec" << x << y << z << w << '\n';*/ } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -95,7 +95,7 @@ struct Vec
 		x{static_cast<T>(v)}, 
 		y{static_cast<T>(v)}, 
 		z{static_cast<T>(v)}, 
-		w{static_cast<T>(v)} { std::cout << "Single" << x << y << z << w << '\n'; } 
+		w{static_cast<T>(v)} { /*std::cout << "Single" << x << y << z << w << '\n';*/ } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -103,11 +103,11 @@ struct Vec
 		x{static_cast<T>(x_)}, 
 		y{static_cast<T>(y_)}, 
 		z{static_cast<T>(z_)}, 
-		w{static_cast<T>(w_)} { std::cout << "Multiple" << x << y << z << w << '\n'; } 
+		w{static_cast<T>(w_)} { /*std::cout << "Multiple" << x << y << z << w << '\n';*/ } 
 
 	template<typename U = T> 
 	requires castable<T, U> 
-	inline explicit Vec(std::initializer_list<U> l) 
+	inline Vec(std::initializer_list<U> l) 
 	{ 
 		assert((l.size() == 1) || (l.size() >= 3)); 
 		auto it = l.begin(); 
@@ -131,8 +131,8 @@ struct Vec
 					z = *(it + 2); 
 					w = *(it + 3); 
 				} 
-		std::cout << "Mut Init List" << x << y << z << w << '\n'; 
-	}
+//		std::cout << "Mut Init List" << x << y << z << w << '\n'; 
+	} 
 
 	template<typename U = T> 
 	requires castable<T, U> 
@@ -140,7 +140,7 @@ struct Vec
 		x{static_cast<T>(v.x)}, 
 		y{static_cast<T>(v.y)}, 
 		z{static_cast<T>(v.z)}, 
-		w{static_cast<T>(v.w)} { std::cout << "From Mut Vec" << x << y << z << w << '\n'; } 
+		w{static_cast<T>(v.w)} { /*std::cout << "From Mut Vec" << x << y << z << w << '\n';*/ } 
 
 	inline T& operator[](const size_t i) 
 	{ 
@@ -161,7 +161,8 @@ struct Vec
 	inline Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
 		T s = static_cast<T>(scale)/length(); 
-		return Vec<T>(x/s, y/s, z/s, w/s); 
+		std::cout << x << ' ' << y << ' ' << z << ' ' << w << ' ' << s << '\n'; 
+		return {x*s, y*s, z*s, w*s}; 
 	} 
 
 	template<typename U = T> 
