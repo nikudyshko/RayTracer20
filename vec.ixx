@@ -161,7 +161,6 @@ struct Vec
 	inline Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
 		T s = static_cast<T>(scale)/length(); 
-		std::cout << x << ' ' << y << ' ' << z << ' ' << w << ' ' << s << '\n'; 
 		return {x*s, y*s, z*s, w*s}; 
 	} 
 
