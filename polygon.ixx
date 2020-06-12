@@ -23,12 +23,6 @@ public:
 		verts.emplace_back(Vec<T>(p3));  
 	} 
 
-	Polygon(std::initializer_list<Vec<T>> l) 
-	{ 
-		assert(l.size() == 3); 
-		verts = l; 
-	} 
-
 	Vec<T> get_normal() 
 	{ 
 		if (has_normal) 
