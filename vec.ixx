@@ -59,33 +59,6 @@ struct Vec
 	inline Vec() : 
 		x{T()}, y{T()}, z{T()}, w{T()} { /*std::cout << "Default" << x << y << z << w << '\n';*/ } 
 
-	inline Vec(std::initializer_list<T> l) 
-	{ 
-		assert((l.size() == 1) || (l.size() >= 3)); 
-		auto it = l.begin(); 
-		if (l.size() == 1) 
-		{ 
-			x = y = z = w = *it;  
-		} 
-		else 
-			if (l.size() == 3) 
-			{ 
-				x = *it; 
-				y = *(it + 1); 
-				z = *(it + 2); 
-				w = T(); 
-			} 
-			else 
-				if (l.size() == 4) 
-				{ 
-					x = *it; 
-					y = *(it + 1); 
-					z = *(it + 2); 
-					w = *(it + 3); 
-				} 
-//		std::cout << "Sim Init List" << x << y << z << w << '\n'; 
-	}  
-
 	inline Vec(const Vec<T>& v) : 
 		x{v.x}, y{v.y}, z{v.z}, w{v.w} { /*std::cout << "From Sim Vec" << x << y << z << w << '\n';*/ } 
 
@@ -104,35 +77,6 @@ struct Vec
 		y{static_cast<T>(y_)}, 
 		z{static_cast<T>(z_)}, 
 		w{static_cast<T>(w_)} { /*std::cout << "Multiple" << x << y << z << w << '\n';*/ } 
-
-	template<typename U = T> 
-	requires castable<T, U> 
-	inline Vec(std::initializer_list<U> l) 
-	{ 
-		assert((l.size() == 1) || (l.size() >= 3)); 
-		auto it = l.begin(); 
-		if (l.size() == 1) 
-		{ 
-			x = y = z = w = *it; 
-		} 
-		else 
-			if (l.size() == 3) 
-			{ 
-				x = *it; 
-				y = *(it + 1); 
-				z = *(it + 2); 
-				w = T(); 
-			} 
-			else 
-				if (l.size() == 4) 
-				{ 
-					x = *it; 
-					y = *(it + 1); 
-					z = *(it + 2); 
-					w = *(it + 3); 
-				} 
-//		std::cout << "Mut Init List" << x << y << z << w << '\n'; 
-	} 
 
 	template<typename U = T> 
 	requires castable<T, U> 
