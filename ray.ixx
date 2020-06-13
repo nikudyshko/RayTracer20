@@ -7,17 +7,10 @@ export module ray;
 template<typename T = float> 
 class Ray 
 { 
-private: 
-	Vec<T> origin, dir; 
-public: 
+public:  
+	Vec<T> orig, dir; 
+
 	Ray() = delete; 
-	Ray(const Vec<T>& o, const Vec<T>& d) : 
-		origin{o}, dir{d} {}; 
-	Ray(std::initializaer_list<Vec<T>> l) 
-	{ 
-		assert(l.size() == 2); 
-		auto it = l.first(); 
-		origin = *it; 
-		dir = *(it + 1); 
-	}
+	Ray(const Vec<T>& orig_, const Vec<T>& dir_) : 
+		orig{orig_}, dir{dir_} {} 
 }; 
