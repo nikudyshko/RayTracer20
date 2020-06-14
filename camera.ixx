@@ -1,8 +1,8 @@
 module; 
 
-import std.core; 
-
 export module camera; 
+
+import vec; 
 
 export template<typename T = float> 
 class Camera 
