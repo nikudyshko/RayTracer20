@@ -1,14 +1,16 @@
 module; 
 
+export module shell; 
+
 import std.core; 
 
-export module shell; 
+import polygon; 
 
 export template<typename T = float> 
 class Shell 
 { 
 private: 
-	std::vector<Polygon<T>> mesh; 
+	std::vector< Polygon<T> > mesh; 
 public: 
 	Shell() {} 
 }; 
