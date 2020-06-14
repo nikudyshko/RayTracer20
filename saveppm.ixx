@@ -1,9 +1,10 @@
 module; 
 
-import std.core; 
-import vec; 
-
 export module saveppm; 
+
+import std.core; 
+
+import vec; 
 
 export template<typename T> 
 void save_ppm( 
