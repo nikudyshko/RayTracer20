@@ -1,8 +1,8 @@
 module; 
 
-import vec; 
-
 export module ray; 
+
+import vec; 
 
 template<typename T = float> 
 class Ray 
