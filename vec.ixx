@@ -2,9 +2,9 @@ module;
 
 #include <cassert> 
 
-import std.core; 
-
 export module vec; 
+
+import std.core;  
 
 template<typename T, typename U> 
 concept castable = requires(T t, U u) 
@@ -36,11 +36,14 @@ concept sim_arithm = requires(T a, T b)
 }; 
 
 template<typename T> 
-concept rootable = requires(T v) 
-{ { std::sqrt(v) }; }; 
+concept math_fun = requires(T v) 
+{ 
+	{ std::abs(v) }; 
+	{ std::sqrt(v) }; 
+}; 
 
 export template<typename T = float> 
-requires std::default_initializable<T> && sim_arithm<T> && rootable<T> 
+requires std::default_initializable<T> && sim_arithm<T> && math_fun<T> 
 struct Vec 
 { 
 	union 
@@ -53,6 +56,10 @@ struct Vec
 		struct 
 		{ 
 			T r, g, b, a; 
+		}; 
+		struct 
+		{ 
+			T s, t, u, v; 
 		}; 
 	}; 
 
@@ -105,7 +112,7 @@ struct Vec
 	inline Vec<T> normalize(U scale = static_cast<U>(1)) 
 	{ 
 		T s = static_cast<T>(scale)/length(); 
-		return {x*s, y*s, z*s, w*s}; 
+		return { x*s, y*s, z*s, w*s }; 
 	} 
 
 	template<typename U = T> 
@@ -155,30 +162,29 @@ requires mut_arithm<T, U> &&
 		 requires(T t, U u) { std::default_initializable<decltype(t*u)>; } 
 inline auto operator^(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
 { 
-	using V = decltype(lhs.x*rhs.y); 
-	V x = lhs.y*rhs.z - lhs.z*rhs.y; 
-	V y = lhs.z*rhs.x - lhs.x*rhs.z; 
-	V z = lhs.x*rhs.y - lhs.y*rhs.x; 
-	V w = V(); 
-	return Vec<V>(x, y, z, w); 
+	return { lhs.y*rhs.z - lhs.z*rhs.y, 
+			 lhs.z*rhs.x - lhs.x*rhs.z, 
+			 lhs.x*rhs.y - lhs.y*rhs.x };  
 } 
 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline auto operator+(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x + rhs.x)> 
 { 
-	using V = decltype(lhs.x + rhs.x); 
-	return Vec<V>(lhs.x + rhs.x, lhs.y + rhs.y, 
-				  lhs.z + rhs.z, lhs.w + rhs.w); 
+	return { lhs.x + rhs.x, 
+			 lhs.y + rhs.y, 
+			 lhs.z + rhs.z, 
+			 lhs.w + rhs.w }; 
 } 
 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline auto operator-(const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
 { 
-	using V = decltype(lhs.x - rhs.x); 
-	return Vec<V>(lhs.x - rhs.x, lhs.y - rhs.y, 
-				  lhs.z - rhs.z, lhs.w - rhs.w); 
+	return { lhs.x - rhs.x, 
+			 lhs.y - rhs.y, 
+			 lhs.z - rhs.z, 
+			 lhs.w - rhs.w }; 
 } 
 
 export template<typename T> 
