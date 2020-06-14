@@ -1,6 +1,8 @@
 module; 
 
-import std.core; 
+export module material; 
+
+import vec; 
 
 export template<typename T = float> 
 struct Material 
