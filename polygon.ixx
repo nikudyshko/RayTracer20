@@ -1,10 +1,12 @@
 module; 
 
+export module polygon; 
+
 import std.core; 
+
 import vec; 
 import ray; 
-
-export module polygon; 
+import render_constants; 
 
 export template<typename T = float> 
 class Polygon 
@@ -29,14 +31,14 @@ public:
 		}
 	} 
 
-	const Vec<T>& get_normal() const 
+	const Vec<T>& get_normal() 
 	{ 
 		if (!has_normal) 
 			calc_normal(); 
 		return normal; 
 	} 
 
-	bool ray_intersect(const Vec<T>& ray, Vec<T>& x_point) const 
+	bool ray_intersect(const Vec<T>& ray, Vec<T>& x_point) 
 	{ 
 		if (!has_normal) 
 			calc_normal(); 
@@ -44,19 +46,19 @@ public:
 		Vec<T> p_v = ray.dir ^ v2; 
 		T det = v1 * p_v; 
 
-		if constexpr(bf_culling) 
+		if constexpr(BF_CULLING) 
 		{ 
-			if (det < static_cast<T>(epsilon)) 
+			if (det < static_cast<T>(EPSILON)) 
 				return false; 
 		} 
 		else 
-			if (std::abs(det) < static_cast<T>(epsilon)) 
+			if (std::abs(det) < static_cast<T>(EPSILON)) 
 				return false; 
 			else 
 			{ 
 				T inv_det = 1 / det; 
 
-				Vec<T> t_v = dir.orig - a; 
+				Vec<T> t_v = ray.orig - a; 
 				x_point.u = inv_det * t_v * p_v; 
 				if (x_point.u < 0 || x_point.u > 1) 
 					return false; 
@@ -66,7 +68,7 @@ public:
 				if (x_point.v < 0 || x_point.u + x_point.v > 1) 
 					return false; 
 
-				t = inv_det * v2 * q_v; 
+				x_point.t = inv_det * v2 * q_v; 
 
 				return true; 
 			} 
