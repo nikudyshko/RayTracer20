@@ -3,8 +3,9 @@ cl.exe /std:c++latest /experimental:module /c /EHsc /MD vec.ixx
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD ray.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD material.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD polygon.ixx 
+cl.exe /std:c++latest /experimental:module /c /EHsc /MD surface.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD shell.ixx  
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD camera.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD saveppm.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD application.ixx 
-cl.exe application.obj vec.obj ray.obj material.obj polygon.obj shell.obj camera.obj saveppm.obj 
+cl.exe application.obj render_constants.obj vec.obj ray.obj material.obj polygon.obj surface.obj shell.obj camera.obj saveppm.obj 
