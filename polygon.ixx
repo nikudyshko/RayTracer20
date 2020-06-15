@@ -13,9 +13,9 @@ class Polygon
 { 
 private: 
 	bool has_normal{false}; 
-	Vec<T> a, b, c, v1, v2, normal; 
+	Vec<T> a{}, b{}, c{}, v1{}, v2{}, normal{}; 
 public: 
-	Polygon() = delete; 
+	Polygon() {}; 
 	Polygon(const Vec<T>& a_, const Vec<T>& b_, const Vec<T>& c_) : 
 		a{a_}, b{b_}, c{c_} {}; 
 
