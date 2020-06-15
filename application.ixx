@@ -15,7 +15,7 @@ export int main()
 	for (int j = 0; j < HEIGHT; ++j) 
 		for (int i = 0; i < WIDTH; ++i) 
 			pics[j*WIDTH + i] = { j/float(HEIGHT), i/float(WIDTH), 0.0f, 0.0f }; 
-	save_ppm<float>(WIDTH, HEIGHT, pics); 
+	save_ppm(WIDTH, HEIGHT, pics); 
 	Vec<float> v1{1, 2, 4}; 
 	Vec<float> v2{4, 5, 3}; 
 	Vec<float> v3{7, 8, 9}; 
