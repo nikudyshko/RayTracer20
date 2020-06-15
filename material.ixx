@@ -7,10 +7,10 @@ import vec;
 export template<typename T = float> 
 struct Material 
 { 
-	T specular, refraction; 
-	Vec<T> reflection, color; 
+	T specular{}, refraction{}; 
+	Vec<T> reflection{}, color{}; 
 
-	Material() = delete; 
+	Material() {}; 
 	Material(T refraction_, 
 			 T specular_, 
 			 const Vec<T>& reflection_, 
