@@ -11,5 +11,5 @@ class Surface
 { 
 private: 
     Polygon<T> geom; 
-    Material<T> prop; 
+    OpticalSurface<T> prop; 
 }; 
