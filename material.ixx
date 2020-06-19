@@ -5,18 +5,28 @@ export module material;
 import vec; 
 
 export template<typename T = float> 
-struct Material 
+struct OpticalSurface 
 { 
-	T specular{}, refraction{}; 
+	T specular{}; 
 	Vec<T> reflection{}, color{}; 
 
-	Material() {}; 
-	Material(T refraction_, 
-			 T specular_, 
-			 const Vec<T>& reflection_, 
-			 const Vec<T>& color_) : 
-		refraction{refraction_}, 
+	OpticalSurface() {} 
+	OpticalSurface(T specular_, 
+				   const Vec<T>& reflection_, 
+				   const Vec<T>& color_) : 
 		specular{specular_}, 
 		reflection{reflection_}, 
 		color{color_} {} 
+}; 
+
+export template<typename T = float> 
+struct OpticalBulk 
+{ 
+	T refraction{}, transparency{}; 
+
+	OpticalBulk() {} 
+	OpticalBulk(T refraction_, 
+				T transparency_) : 
+		refraction{refraction_}, 
+		transparency{transparency_} {} 
 }; 
