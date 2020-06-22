@@ -11,8 +11,8 @@ export template<typename T = float>
 class Shell 
 { 
 private: 
-	OpticalBulk<T> prop; 
-	std::vector< Surface<T> > mesh; 
+	OpticalBulk<T> m_Prop; 
+	std::vector< Surface<T> > m_Mesh; 
 public: 
 	Shell() {} 
 }; 
