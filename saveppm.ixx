@@ -10,11 +10,11 @@ export template<typename T>
 void save_ppm( 
 	size_t width, 
 	size_t height, 
-	const std::vector<Vec<T>>& framebuffer 
+	const std::vector< Vec<T> >& framebuffer 
 ) 
 { 
 	std::ofstream output; 
-	output.open("./render.ppm", std::ios::binary); 
+	output.open("./render.ppm", std::ios::out || std::ios::binary); 
 	output << "P6\n" << width << ' ' << height << "\n255\n"; 
 	for (size_t i = 0; i < width * height; ++i) 
 		for (size_t j = 0; j < 3; ++j) 
