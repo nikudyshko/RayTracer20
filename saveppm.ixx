@@ -6,7 +6,7 @@ import std.core;
 
 import vec; 
 
-export template<typename T> 
+export template<typename T = float> 
 void save_ppm( 
 	size_t width, 
 	size_t height, 
