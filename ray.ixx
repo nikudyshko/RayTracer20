@@ -7,12 +7,12 @@ import vec;
 export template<typename T = float> 
 struct Ray 
 { 
-	Vec<T> orig, dir; 
+	Vec<T> origin{}, dir{}; 
 
 	inline 
-	Ray() : orig{}, dir{} {}; 
+	Ray () {} 
 
 	inline 
-	Ray(const Vec<T>& orig_, const Vec<T>& dir_) : 
-		orig{orig_}, dir{dir_} {} 
+	Ray (const Vec<T>& origin_, const Vec<T>& dir_) : 
+		origin{origin_}, dir{dir_} {} 
 }; 
