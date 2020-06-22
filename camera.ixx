@@ -11,77 +11,83 @@ export template<typename T = float>
 class Camera 
 { 
 private: 
-	bool has_rays{false}; 
-	size_t width{}, height{}; 
-	size_t current_ray{}; 
-	T fov{}; 
-	Vec<T> origin{}, dir{}; 
-	std::vector< Ray<T> > rays; 
+	bool m_HasRays{false}; 
+	size_t m_Width{}, m_Height{}; 
+	size_t m_CurrentRay{}; 
+	T m_FOV{}; 
+	T m_AspectRatio{}; 
+	Vec<T> m_Origin{}, m_Dir{}; 
+	std::vector< Ray<T> > m_Rays; 
 public: 
 	inline 
 	Camera() = delete; 
 
 	inline 
-	Camera(size_t width_, 
-		   size_t height_, 
-		   T fov_, 
-		   const Vec<T>& origin_, 
-		   const Vec<T>& dir_) : 
-		width{width_}, 
-		height{height_}, 
-		fov{fov_}, 
-		origin{origin_}, 
-		dir{dir_} {} 
+	Camera(size_t width, 
+		   size_t height, 
+		   T FOV, 
+		   const Vec<T>& origin, 
+		   const Vec<T>& dir) : 
+		m_Width{width}, 
+		m_Height{height}, 
+		m_FOV{FOV}, 
+		m_AspectRatio{m_Width/static_cast<T>(m_Height)}, 
+		m_Origin{origin}, 
+		m_Dir{dir} {} 
 
-	void set_resolution(size_t width_, size_t height_) 
+	void set_resolution(size_t width, size_t height) 
 	{ 
-		width = width_; 
-		height = height_; 
+		m_Width = width; 
+		m_Height = height; 
+
+		m_AspectRatio = m_Width/static_cast<T>(m_Height); 
 
 		calc_rays(); 
 	} 
 
-	void set_fov(T fov_) 
+	void set_FOV(T FOV) 
 	{ 
-		fov = fov_; 
+		m_FOV = FOV; 
 
 		calc_rays(); 
 	} 
 
-	void set_origin(const Vec<T>& origin_) 
+	void set_origin(const Vec<T>& origin) 
 	{ 
-		origin = origin_; 
+		m_Origin = origin; 
 
 		calc_rays(); 
 	} 
 
-	void set_direction(const Vec<T>& dir_) 
+	void set_direction(const Vec<T>& dir) 
 	{ 
-		dir = dir_; 
+		m_Dir = dir; 
 
 		calc_rays(); 
 	} 
 
 	void calc_rays() 
 	{ 
-		rays.resize(width*height); 
+		m_Rays.resize(m_Width*m_Height); 
 
-		for (size_t i = 0; i < width; ++i) 
-			for (size_t j = 0; j < height; ++j) 
+		for (size_t i = 0; i < m_Width; ++i) 
+			for (size_t j = 0; j < m_Height; ++j) 
 			{ 
-				T dir_x = (i + 0.5) - width/2; 
-				T dir_y = -(j + 0.5) + height/2; 
-				T dir_z = -height/(2.0*std::tan(fov/2.)); 
-				rays[i + j*height] = { .x = dir_x, .y = dir_y, .z = dir_z }.normalize(); 
+				T dir_x = (2*(i + 0.5)/static_cast<T>(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
+				T dir_y = -(2*(j + 0.5)/static_cast<T>(m_Height) - 1)*std::tan(m_FOV/2.); 
+				m_Rays[i*m_Height + j] = { .x = dir_x, .y = dir_y, .z = static_cast<T>(-1) }.normalize(); 
 			} 
 
-		has_rays = true; 
+		m_HasRays = true; 
 	} 
 
-	const Vec<T>& get_next_ray() 
+	const Vec<T>& get_next_ray() const 
 	{ 
-		current_ray = (current_ray + 1) % (width*height); 
+		if (m_HasRays) 
+		{ 
+			m_CurrentRay = (m_CurrentRay + 1) % m_Rays.size(); 
 
-		return rays[current_ray]; 
-	}
+			return m_Rays[m_CurrentRay]; 
+		} 
+	} 
 }; 
