@@ -10,6 +10,6 @@ export template<typename T = float>
 class Surface 
 { 
 private: 
-    Polygon<T> geom; 
-    OpticalSurface<T> prop; 
+    Polygon<T> m_Geom; 
+    OpticalSurface<T> m_Prop; 
 }; 
