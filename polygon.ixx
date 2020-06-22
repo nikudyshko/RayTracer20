@@ -12,65 +12,66 @@ export template<typename T = float>
 class Polygon 
 { 
 private: 
-	bool has_normal{false}; 
-	Vec<T> a{}, b{}, c{}, v1{}, v2{}, normal{}; 
+	bool m_HasNormal{false}; 
+	Vec<T> m_A{}, m_B{}, m_C{}, m_V1{}, m_V2{}, m_Normal{}; 
 public: 
-	Polygon() {}; 
-	Polygon(const Vec<T>& a_, const Vec<T>& b_, const Vec<T>& c_) : 
-		a{a_}, b{b_}, c{c_} {}; 
+	Polygon () {}; 
+	Polygon (const Vec<T>& a, const Vec<T>& b, const Vec<T>& c) : 
+		m_A{a}, m_B{b}, m_C{c} {}; 
 
-	void calc_normal() 
+	void calc_normal () 
 	{ 
-		if (!has_normal) 
+		if (!m_HasNormal) 
 		{ 
-			v1 = b - a; 
-			v2 = c - a; 
+			m_V1 = m_B - m_A; 
+			m_V2 = m_C = m_A; 
 
-			has_normal = true; 
-			normal = (v1 ^ v2).normalize(); 
-		}
+			m_Normal = (m_V1 ^ m_V2).normalize(); 
+			m_HasNormal = true; 
+		} 
 	} 
 
-	const Vec<T>& get_normal() 
+	const Vec<T>& get_normal () 
 	{ 
-		if (!has_normal) 
+		if (!m_HasNormal) 
 			calc_normal(); 
-		return normal; 
+		return m_Normal; 
 	} 
 
-	bool ray_intersect(const Vec<T>& ray, Vec<T>& x_point) 
+	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) 
 	{ 
-		if (!has_normal) 
+		if (!m_HasNormal) 
 			calc_normal(); 
 
-		Vec<T> p_v = ray.dir ^ v2; 
-		T det = v1 * p_v; 
+		Vec<T> p_v = ray.dir ^ m_V2; 
+		T det = m_V1 * p_v; 
 
-		if constexpr(BF_CULLING) 
+		if constexpr (BF_CULLING) 
 		{ 
-			if (det < static_cast<T>(EPSILON)) 
+			if (det < static_cast<T>(EPS)) 
 				return false; 
 		} 
 		else 
-			if (std::abs(det) < static_cast<T>(EPSILON)) 
+			if (std::abs(det) < static_cast<T>(EPS)) 
 				return false; 
 			else 
 			{ 
 				T inv_det = 1 / det; 
 
-				Vec<T> t_v = ray.orig - a; 
+				Vec<T> t_v = ray.origin - m_A; 
 				x_point.u = inv_det * t_v * p_v; 
 				if (x_point.u < 0 || x_point.u > 1) 
 					return false; 
 
-				Vec q_v = t_v ^ v1; 
+				Vec<T> q_v = t_v ^ m_V1; 
 				x_point.v = inv_det * ray.dir * q_v; 
+
 				if (x_point.v < 0 || x_point.u + x_point.v > 1) 
 					return false; 
 
-				x_point.t = inv_det * v2 * q_v; 
+				x_point.t = inv_det * m_V2 * q_v; 
 
 				return true; 
 			} 
-	}
+	} 
 }; 
