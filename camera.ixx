@@ -90,4 +90,10 @@ public:
 			return m_Rays[m_CurrentRay]; 
 		} 
 	} 
+
+	const std::vector< Vec<T> >& get_rays() 
+	{ 
+		if (m_HasRays) 
+			return m_Rays; 
+	} 
 }; 
