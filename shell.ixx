@@ -13,6 +13,10 @@ class Shell
 private: 
 	OpticalBulk<T> m_BulkOpt{}; 
 	std::vector< Surface<T> > m_Mesh{}; 
+
+	std::vector< Vec<T> > m_TestRays{}; 
+
+	std::vector< Shell<T> > m_InnerShels{}; 
 public: 
 	Shell() {} 
 	Shell(const OpticalBulk<T>& bulk_opt) : 
