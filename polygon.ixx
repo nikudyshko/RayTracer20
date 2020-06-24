@@ -38,6 +38,22 @@ public:
 		return m_Normal; 
 	} 
 
+	Vec<T> get_max_coords() 
+	{ 
+		T x = std::max(m_A.x, std::max(m_B.x, m_C.x)); 
+		T y = std::max(m_A.y, std::max(m_B.y, m_C.y)); 
+		T z = std::max(m_A.z, std::max(m_B.z, m_C.z)); 
+		return {x, y, z}; 
+	} 
+
+	Vec<T> get_min_coords() 
+	{ 
+		T x = std::min(m_A.x, std::min(m_B.x, m_C.x)); 
+		T y = std::min(m_A.y, std::min(m_B.y, m_C.y)); 
+		T z = std::min(m_A.z, std::min(m_B.z, m_C.z)); 
+		return {x, y, z}; 
+	} 
+
 	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) 
 	{ 
 		if (!m_HasNormal) 
