@@ -21,4 +21,7 @@ public:
 
     void set_polygon(const Polygon<T>& p) { m_Geom = Polygon<T>(p); } 
     void set_opt_prop(const OpticalSurface<T>& s) { m_SurfOpt = OpticalSurface<T>(s); } 
+
+    Vec<T> get_min_coords() { return m_Geom.get_min_coords(); } 
+    Vec<T> get_max_coords() { return m_Geom.get_max_coords(); } 
 }; 
