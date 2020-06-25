@@ -50,6 +50,6 @@ export int main()
 
 	Shell<float> sh{}; 
 	sh.set_opt_prop(opt_b); 
-	sh.add_polygons(mesh); 
+	sh.add_surfaces(mesh); 
 	return 0; 
 } 
