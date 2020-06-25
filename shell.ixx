@@ -30,8 +30,8 @@ public:
 
 	void set_opt_prop(const OpticalBulk<T>& bulk_opt) { m_BulkOpt = OpticalBulk<T>(bulk_opt); } 
 	void add_surface(Surface<T> surf) { m_Mesh.push_back(surf); } 
-	template< template<typename, typename> typename Container > 
-	void add_surfaces(const Container< Surface<T>, std::allocator<Surface<T>> >& mesh) 
+	template<typename Container > 
+	void add_surfaces(const Container& mesh) 
 	{ 
 		std::copy(mesh.begin(), mesh.end(), std::back_inserter(m_Mesh)); 
 	} 
