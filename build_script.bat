@@ -1,4 +1,5 @@
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD render_constants.ixx 
+cl.exe /std:c++latest /experimental:module /c /EHsc /MD custom_concepts.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD vec.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD ray.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD material.ixx 
