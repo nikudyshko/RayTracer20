@@ -8,17 +8,23 @@ import vec;
 import ray; 
 import render_constants; 
 
+// Struct to implement Polygon 
 export template<typename T = float> 
 class Polygon 
 { 
 private: 
+	// Shows if the normal has been calculated before 
 	bool m_HasNormal{false}; 
+	// Vector that stores polygon vertices, polygon edges and its' normal 
 	Vec<T> m_A{}, m_B{}, m_C{}, m_V1{}, m_V2{}, m_Normal{}; 
 public: 
+	// Default constructor 
 	Polygon () {}; 
+	// Contstructs polygon from three vertices 
 	Polygon (const Vec<T>& a, const Vec<T>& b, const Vec<T>& c) : 
 		m_A{a}, m_B{b}, m_C{c} {}; 
 
+	// Calculates normal of the polygon 
 	void calc_normal () 
 	{ 
 		if (!m_HasNormal) 
@@ -31,6 +37,7 @@ public:
 		} 
 	} 
 
+	// Returns the normal vector of polygon 
 	const Vec<T>& get_normal () 
 	{ 
 		if (!m_HasNormal) 
@@ -38,6 +45,7 @@ public:
 		return m_Normal; 
 	} 
 
+	// Returns the minimal coordinates of polygon 
 	Vec<T> get_min_coords() 
 	{ 
 		T x = std::min(m_A.x, std::min(m_B.x, m_C.x)); 
@@ -46,6 +54,7 @@ public:
 		return {x, y, z}; 
 	} 
 
+	// Returns the maximal coordinates of polygon 
 	Vec<T> get_max_coords() 
 	{ 
 		T x = std::max(m_A.x, std::max(m_B.x, m_C.x)); 
@@ -54,6 +63,7 @@ public:
 		return {x, y, z}; 
 	} 
 
+	// Code to check if the ray intersects the Polygon, Moller-Trumbore algorithm 
 	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) 
 	{ 
 		if (!m_HasNormal) 
