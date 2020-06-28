@@ -8,34 +8,51 @@ import vec;
 import material; 
 import surface; 
 
+// Structure to implement a shell. Shell represents 
+// a basic object - has surface (array of Surface's), 
+// inner optical properties (OpticalBulk) and 
+// contains another shells 
 export template<typename T = float> 
 class Shell 
 { 
 private: 
+	// Inner optical properties 
 	OpticalBulk<T> m_BulkOpt{}; 
 
+	// Bound Sphere parameters 
 	Vec<T> m_BoundOrigin{}, m_BoundRadius{}; 
 
+	// Mesh. Represents geometry of shell 
 	std::vector< Surface<T> > m_Mesh{}; 
 
+	// Rays, that hit Bound Sphere. Should be 
+	// properly traced against every Surface element 
 	std::vector< Vec<T> > m_TestRays{}; 
 
+	// Inner shells 
 	std::vector< Shell<T> > m_InnerShels{}; 
 public: 
+	// Default constructor 
 	Shell() {} 
+	// Constructs a Shell from only optical properties 
 	Shell(const OpticalBulk<T>& bulk_opt) : 
 		m_BulkOpt{bulk_opt}, m_Mesh{} {} 
+	// Constructs a Shell from only mesh 
 	Shell(std::initializer_list< Surface<T> > mesh) : 
 		m_BulkOpt{}, m_Mesh(mesh) {}; 
 
+	// Function to set optical properties 
 	void set_opt_prop(const OpticalBulk<T>& bulk_opt) { m_BulkOpt = OpticalBulk<T>(bulk_opt); } 
+	// Function to add a single Surface to mesh 
 	void add_surface(Surface<T> surf) { m_Mesh.push_back(surf); } 
+	// Function to set a complete mesh 
 	template<typename Container > 
 	void add_surfaces(const Container& mesh) 
 	{ 
 		std::copy(mesh.begin(), mesh.end(), std::back_inserter(m_Mesh)); 
 	} 
 
+	// Function to calculate bound sphere 
 	void calc_bound_sphere() 
 	{ 
 		Surface<T> min_point, max_point; 
