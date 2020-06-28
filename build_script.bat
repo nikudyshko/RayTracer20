@@ -9,4 +9,4 @@ cl.exe /std:c++latest /experimental:module /c /EHsc /MD shell.ixx
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD camera.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD saveppm.ixx 
 cl.exe /std:c++latest /experimental:module /c /EHsc /MD application.ixx 
-cl.exe application.obj render_constants.obj vec.obj ray.obj material.obj polygon.obj surface.obj shell.obj camera.obj saveppm.obj 
+cl.exe application.obj render_constants.obj custom_concepts.obj vec.obj ray.obj material.obj polygon.obj surface.obj shell.obj camera.obj saveppm.obj 
