@@ -214,7 +214,7 @@ auto operator- (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rh
 
 // Vector output operator 
 export template<typename T> 
-requires output_op<T> 
+//requires output_op<T> 
 inline 
 std::ostream& operator<< (std::ostream& out, const Vec<T>& v) 
 { 
