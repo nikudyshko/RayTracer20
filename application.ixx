@@ -5,7 +5,9 @@ export module application;
 import std.core; 
 
 import vec; 
+import ray; 
 import shell; 
+import camera;  
 import polygon; 
 import surface; 
 import saveppm; 
@@ -51,5 +53,18 @@ export int main()
 	Shell<float> sh{}; 
 	sh.set_opt_prop(opt_b); 
 	sh.add_surfaces(mesh); 
+	sh.calc_bound_sphere(); 
+
+	Vec<float> origin{1.0f, 1.0f, 1.0f}; 
+	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
+
+	Camera<float> cam{WIDTH, HEIGHT, 3.14f/2.0f, origin, look_at}; 
+	cam.calc_matrix(); 
+	cam.calc_rays(); 
+	Ray<float> r = cam.get_next_ray(); 
+	const std::vector< Ray<float> > rays = cam.get_rays(); 
+
+	std::cout << r.origin << '\n' << r.dir << '\n'; 
+
 	return 0; 
 } 
