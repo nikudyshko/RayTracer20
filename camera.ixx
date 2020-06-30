@@ -20,7 +20,7 @@ private:
 	// Width and Height of Camera (pixels) 
 	size_t m_Width{}, m_Height{}; 
 	// Index of the current Ray 
-	size_t m_CurrentRay{}; 
+	mutable size_t m_CurrentRay{}; 
 	// Cameras' fiels of view 
 	T m_FOV{}; 
 	// Cameras' aspect ratio 
@@ -89,27 +89,26 @@ public:
 	// Function to calculate camera-to-world matrix 
 	void calc_matrix() 
 	{ 
-		Vec<T> dr = m_LookAt - m_Origin; 
-		Vec<T> pr = m_Origin;  
-		pr.z = 0; 
-		Vec<T> up = (pr ^ dr) ^ dr; 
+		Vec<T> forward = (m_Origin - m_LookAt).normalize(); 
 
-		Vec<T> zA = (m_Origin - m_LookAt).normalize(); 
-		Vec<T> xA = (up ^ zA).normalize(); 
-		Vec<T> yA = zA ^ xA; 
+		Vec<T> temp = m_Origin; 
+		temp.z = 0; 
+		Vec<T> right = forward ^ (temp - m_Origin).normalize(); 
+
+		Vec<T> up = forward ^ right; 
 
 		m_CTWMatrix = Mat<T>{ 
-			{ 		  xA.x, 		yA.x, 		zA.x,   0 }, 
-			{ 		  xA.y, 		yA.y, 		zA.y,   0 }, 
-			{ 		  xA.z, 		yA.z, 		zA.z,   0 }, 
-			{ -xA*m_Origin, -yA*m_Origin, -zA*m_Origin, 1 } 
-		};  
-	}
+			{ 	 right.x, 		up.x,  forward.x, 0 }, 
+			{ 	 right.y, 		up.y,  forward.y, 0 }, 
+			{ 	 right.z, 		up.z,  forward.z, 0 }, 
+			{ m_Origin.x, m_Origin.y, m_Origin.z, 1 } 
+		}; 
+	} 
 
 	// Function to calculate Rays 
 	void calc_rays() 
 	{ 
-		Vec<T> t_vec{}; 
+		Vec<T> dir_vec{}; 
 
 		m_Rays.resize(m_Width*m_Height); 
 
@@ -118,15 +117,15 @@ public:
 			{ 
 				T dir_x = (2*(i + 0.5)/static_cast<T>(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
 				T dir_y = -(2*(j + 0.5)/static_cast<T>(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
-				t_vec = { .x = dir_x, .y = dir_y, .z = -1};   
-				m_Rays[i*m_Height + j] = m_CTWMatrix*t_vec.normalize(); 
+				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, static_cast<T>(1) }.normalize(); 
+				m_Rays[i*m_Height + j] = Ray<T>{ m_Origin, dir_vec }; 
 			} 
 
 		m_HasRays = true; 
 	} 
 
 	// Function return a single Ray 
-	const Vec<T>& get_next_ray() const 
+	const Ray<T>& get_next_ray() const 
 	{ 
 		if (m_HasRays) 
 		{ 
@@ -137,7 +136,7 @@ public:
 	} 
 
 	// Function to return a whole array of Rays 
-	const std::vector< Vec<T> >& get_rays() 
+	const std::vector< Ray<T> >& get_rays() const 
 	{ 
 		if (m_HasRays) 
 			return m_Rays; 
