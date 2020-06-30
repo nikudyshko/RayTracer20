@@ -25,7 +25,7 @@ struct Mat
 
 // Matrix-Vector multiplication 
 export template<typename T, typename U> 
-auto operator* (const Mat<T>& m, const Vec<T>& v) -> Vec<decltype(m.cols[0].x*v.x)> 
+auto operator* (const Mat<T>& m, const Vec<U>& v) -> Vec<decltype(m.cols[0].x*v.x)> 
 { 
     using W = decltype(m.cols[0].x*v.x); 
 
