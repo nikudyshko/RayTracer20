@@ -16,21 +16,25 @@ export template<typename T = float>
 class Shell 
 { 
 private: 
+	// Bound Sphere radius 
+	T m_BoundRadius{}; 
+
 	// Inner optical properties 
 	OpticalBulk<T> m_BulkOpt{}; 
 
-	// Bound Sphere parameters 
-	Vec<T> m_BoundOrigin{}, m_BoundRadius{}; 
+	// Bound Sphere origin 
+	Vec<T> m_BoundOrigin{}; 
 
-	// Mesh. Represents geometry of shell 
+	// Mesh. Represents geometry of Shell  
 	std::vector< Surface<T> > m_Mesh{}; 
 
 	// Rays, that hit Bound Sphere. Should be 
 	// properly traced against every Surface element 
+
 	std::vector< Vec<T> > m_TestRays{}; 
 
-	// Inner shells 
-	std::vector< Shell<T> > m_InnerShels{}; 
+	// Inner Shells  
+	std::vector< Shell<T> > m_InnerShells{}; 
 public: 
 	// Default constructor 
 	Shell() {} 
@@ -70,6 +74,6 @@ public:
 			max_point.z = std::max(max_point.z, temp_max.z); 
 		} 
 		m_BoundOrigin = (max_point + min_point)/2; 
-		m_BoundRadius = (max_point - min_point)/2; 
+		m_BoundRadius = (max_point - min_point).length()/2; 
 	} 
 }; 
