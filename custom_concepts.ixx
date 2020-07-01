@@ -10,8 +10,8 @@ import std.core;
 export template<typename T, typename U> 
 concept castable = requires (T t, U u) 
 { 
-    { static_cast<T>(u) } -> T; 
-    { static_cast<U>(t) } -> T; 
+    { T(u) } -> T; 
+    { U(t) } -> U; 
 }; 
 
 // Concept to ensure possibility of basic math between two types 
@@ -49,4 +49,12 @@ concept math_fun = requires(T v)
     { std::abs(v) }; 
     { std::tan(v) }; 
     { std::sqrt(v) }; 
+}; 
+
+// Concept to ensure applicability of streaming operators 
+export template<typename T> 
+concept output_op = requires(T v) 
+{ 
+    { std::cin >> v }; 
+    { std::cout << v }; 
 }; 
