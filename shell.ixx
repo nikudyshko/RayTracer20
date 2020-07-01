@@ -59,7 +59,7 @@ public:
 	// Function to calculate bound sphere 
 	void calc_bound_sphere() 
 	{ 
-		Surface<T> min_point, max_point; 
+		Vec<T> min_point, max_point; 
 		for (Surface<T>& s : m_Mesh) 
 		{ 
 			Vec<T> temp_min = s.get_min_coords(); 
@@ -73,7 +73,7 @@ public:
 			max_point.y = std::max(max_point.y, temp_max.y); 
 			max_point.z = std::max(max_point.z, temp_max.z); 
 		} 
-		m_BoundOrigin = (max_point + min_point)/2; 
-		m_BoundRadius = (max_point - min_point).length()/2; 
+		m_BoundOrigin = 0.5*(max_point + min_point);  
+		m_BoundRadius = 0.5*(max_point - min_point).length(); 
 	} 
 }; 
