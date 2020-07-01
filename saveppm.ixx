@@ -19,6 +19,6 @@ void save_ppm(
 	output << "P6\n" << width << ' ' << height << "\n255\n"; 
 	for (size_t i = 0; i < width*height; ++i) 
 		for (size_t j = 0; j < 3; ++j) 
-			output << static_cast<char>(255*std::max(0.f, std::min(1.f, framebuffer[i][j])));  
+			output << char(255*std::max(0.f, std::min(1.f, framebuffer[i][j])));  
 	output.close(); 
 }
