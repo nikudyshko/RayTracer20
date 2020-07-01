@@ -21,6 +21,14 @@ struct Mat
     inline 
     Mat (std::initializer_list< Vec<T> > l) : 
         cols{l} {} 
+
+    template<typename U> 
+    inline 
+    Mat<T>& operator= (const Mat<U>& m) 
+    { 
+        for (auto& v : m.cols) 
+            cols.push_back(v); 
+    } 
 }; 
 
 // Matrix-Vector multiplication 
