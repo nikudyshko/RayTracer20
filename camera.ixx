@@ -47,7 +47,7 @@ public:
 		m_Width{width}, 
 		m_Height{height}, 
 		m_FOV{FOV}, 
-		m_AspectRatio{m_Width/static_cast<T>(m_Height)}, 
+		m_AspectRatio{m_Width/T(m_Height)}, 
 		m_Origin{origin}, 
 		m_LookAt{look_at} {} 
 
@@ -57,7 +57,7 @@ public:
 		m_Width = width; 
 		m_Height = height; 
 
-		m_AspectRatio = m_Width/static_cast<T>(m_Height); 
+		m_AspectRatio = m_Width/T(m_Height); 
 
 		calc_rays(); 
 	} 
@@ -97,11 +97,13 @@ public:
 
 		Vec<T> up = forward ^ right; 
 
+		std::cout << forward << '\n' << right << '\n' << up << '\n';  
+
 		m_CTWMatrix = Mat<T>{ 
-			{ 	 right.x, 		up.x,  forward.x, 0 }, 
-			{ 	 right.y, 		up.y,  forward.y, 0 }, 
-			{ 	 right.z, 		up.z,  forward.z, 0 }, 
-			{ m_Origin.x, m_Origin.y, m_Origin.z, 1 } 
+			Vec<T>{    right.x, 	  up.x,  forward.x, T(0) }, 
+			Vec<T>{    right.y, 	  up.y,  forward.y, T(0) }, 
+			Vec<T>{    right.z, 	  up.z,  forward.z, T(0) }, 
+			Vec<T>{ m_Origin.x, m_Origin.y, m_Origin.z, T(1) } 
 		}; 
 	} 
 
@@ -115,9 +117,9 @@ public:
 		for (size_t i = 0; i < m_Width; ++i) 
 			for (size_t j = 0; j < m_Height; ++j) 
 			{ 
-				T dir_x = (2*(i + 0.5)/static_cast<T>(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
-				T dir_y = -(2*(j + 0.5)/static_cast<T>(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
-				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, static_cast<T>(1) }.normalize(); 
+				T dir_x = (2*(i + 0.5)/T(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
+				T dir_y = -(2*(j + 0.5)/T(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
+				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1) }.normalize(); 
 				m_Rays[i*m_Height + j] = Ray<T>{ m_Origin, dir_vec }; 
 			} 
 
@@ -133,12 +135,13 @@ public:
 
 			return m_Rays[m_CurrentRay]; 
 		} 
+
+		return Ray<T>{}; 
 	} 
 
 	// Function to return a whole array of Rays 
 	const std::vector< Ray<T> >& get_rays() const 
 	{ 
-		if (m_HasRays) 
-			return m_Rays; 
+		return m_Rays;  
 	} 
 }; 
