@@ -74,11 +74,11 @@ public:
 
 		if constexpr (BF_CULLING) 
 		{ 
-			if (det < static_cast<T>(EPS)) 
+			if (det < T(EPS)) 
 				return false; 
 		} 
 		else 
-			if (std::abs(det) < static_cast<T>(EPS)) 
+			if (std::abs(det) < T(EPS)) 
 				return false; 
 			else 
 			{ 
