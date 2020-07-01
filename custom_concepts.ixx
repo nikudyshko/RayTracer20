@@ -53,7 +53,7 @@ concept math_fun = requires(T v)
 
 // Concept to ensure applicability of streaming operators 
 export template<typename T> 
-concept output_op = requires(T v) 
+concept stream_ops = requires(T v) 
 { 
     { std::cin >> v }; 
     { std::cout << v }; 
