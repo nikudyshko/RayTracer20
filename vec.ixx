@@ -19,7 +19,7 @@ struct Vec
 	union 
 	{ 
 		// Access vector parameters as array 
-		T vec_[4]; 
+		T vec_[4]{}; 
 		// Access vector parameters as cartesian coordinates 
 		struct 
 		{ 
@@ -47,35 +47,38 @@ struct Vec
 	Vec (const Vec<T>& v) : 
 		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
 
+	// Move constructor 
+	inline 
+	Vec (Vec<T>&& v) : 
+		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
+
 	// Construct vector from a single scalar value 
 	template<typename U = T> 
 	requires castable<T, U> 
 	inline 
 	Vec (U v) : 
-		x{static_cast<T>(v)}, 
-		y{static_cast<T>(v)}, 
-		z{static_cast<T>(v)}, 
-		w{static_cast<T>(v)} {} 
+		x{T(v)}, y{T(v)}, z{T(v)}, w{T(v)} {} 
 
 	// Construct vector from a four scalar values 
 	template<typename U = T> 
 	requires castable<T, U> 
 	inline 
 	Vec (U x_, U y_, U z_, U w_ = U()) : 
-		x{static_cast<T>(x_)}, 
-		y{static_cast<T>(y_)}, 
-		z{static_cast<T>(z_)}, 
-		w{static_cast<T>(w_)} {} 
+		x{T(x_)}, y{T(y_)}, z{T(z_)}, w{T(w_)} {} 
 
 	// Construct vector from another vector with different inner type 
 	template<typename U = T> 
 	requires castable<T, U> 
 	inline 
 	Vec (const Vec<U>& v) : 
-		x{static_cast<T>(v.x)}, 
-		y{static_cast<T>(v.y)}, 
-		z{static_cast<T>(v.z)}, 
-		w{static_cast<T>(v.w)} {} 
+		x{T(v.x)}, y{T(v.y)}, z{T(v.z)}, w{T(v.w)} {} 
+
+	// Construct vector from another vector rvalue with different inner type 
+	template<typename U = T> 
+	requires castable<T, U> 
+	inline 
+	Vec (Vec<U>&& v) : 
+		x{T(v.x)}, y{T(v.y)}, z{t(v.z)}, w{T(v.w)} {} 
 
 	// Indexed access to vector components 
 	inline 
@@ -99,10 +102,23 @@ struct Vec
 	inline 
 	Vec<T>& operator= (const Vec<U>& rhs) 
 	{ 
-		x = static_cast<T>(rhs.x); 
-		y = static_cast<T>(rhs.y); 
-		z = static_cast<T>(rhs.z); 
-		w = static_cast<T>(rhs.w); 
+		x = T(rhs.x); 
+		y = T(rhs.y); 
+		z = T(rhs.z); 
+		w = T(rhs.w); 
+		return *this; 
+	} 
+
+	// Move assignement operato 
+	template<typename U = T> 
+	requires castable<T, U> 
+	inline 
+	Vec<T>& operator= (Vec<U>&& rhs) 
+	{ 
+		x = T(rhs.x); 
+		y = T(rhs.y); 
+		z = T(rhs.z); 
+		w = T(rhs.w); 
 		return *this; 
 	} 
 
@@ -112,10 +128,10 @@ struct Vec
 	inline 
 	Vec<T>& operator+= (const Vec<U>& rhs) 
 	{ 
-		x += static_cast<T>(rhs.x); 
-		y += static_cast<T>(rhs.y); 
-		z += static_cast<T>(rhs.z); 
-		w += static_cast<T>(rhs.w); 
+		x += T(rhs.x); 
+		y += T(rhs.y); 
+		z += T(rhs.z); 
+		w += T(rhs.w); 
 		return *this; 
 	} 
 
@@ -125,10 +141,10 @@ struct Vec
 	inline 
 	Vec<T>& operator-= (const Vec<U>& rhs) 
 	{ 
-		x -= static_cast<T>(rhs.x); 
-		y -= static_cast<T>(rhs.y); 
-		z -= static_cast<T>(rhs.z); 
-		w -= static_cast<T>(rhs.w); 
+		x -= T(rhs.x); 
+		y -= T(rhs.y); 
+		z -= T(rhs.z); 
+		w -= T(rhs.w); 
 		return *this; 
 	} 
 
@@ -140,9 +156,9 @@ struct Vec
 	template<typename U = T> 
 	requires castable<T, U> 
 	inline 
-	Vec<T> normalize (U scale = static_cast<U>(1)) 
+	Vec<T> normalize (U scale = U(1)) 
 	{ 
-		T s = static_cast<T>(scale)/length(); 
+		T s = T(scale)/length(); 
 		return { x*s, y*s, z*s, w*s }; 
 	} 
 }; 
@@ -214,7 +230,7 @@ auto operator- (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rh
 
 // Vector output operator 
 export template<typename T> 
-//requires output_op<T> 
+requires stream_ops<T> 
 inline 
 std::ostream& operator<< (std::ostream& out, const Vec<T>& v) 
 { 
