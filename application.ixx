@@ -66,5 +66,7 @@ export int main()
 
 	std::cout << r.origin << '\n' << r.dir << '\n'; 
 
+	std::cout << WIDTH*HEIGHT << ' ' << rays.size() << '\n' << rays[3].dir << '\n' << rays[3].origin << '\n'; 
+
 	return 0; 
 } 
