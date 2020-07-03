@@ -5,7 +5,7 @@ export module ray;
 import vec; 
 
 // Ray structure 
-export template<typename T = float> 
+export template<typename T> 
 struct Ray 
 { 
 	// origin - origin of the ray 

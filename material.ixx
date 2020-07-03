@@ -5,7 +5,7 @@ export module material;
 import vec; 
 
 // Optical properties of surface structure 
-export template<typename T = float> 
+export template<typename T> 
 struct OpticalSurface 
 { 
 	// Specular exponent parameter 
@@ -26,7 +26,7 @@ struct OpticalSurface
 }; 
 
 // Optical properties of bulk structure 
-export template<typename T = float> 
+export template<typename T> 
 struct OpticalBulk 
 { 
 	// refraction - refraction parameter 

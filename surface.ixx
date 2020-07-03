@@ -7,7 +7,7 @@ import polygon;
 import material; 
 
 // Struct to implement basic element of surface 
-export template<typename T = float> 
+export template<typename T> 
 class Surface 
 { 
 private: 

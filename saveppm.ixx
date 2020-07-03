@@ -7,7 +7,7 @@ import std.core;
 import vec; 
 
 // Function that saves image in .ppm format 
-export template<typename T = float> 
+export template<typename T> 
 void save_ppm( 
 	size_t width, 		// Image width 
 	size_t height, 		// Image height 

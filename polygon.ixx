@@ -9,7 +9,7 @@ import ray;
 import render_constants; 
 
 // Struct to implement Polygon 
-export template<typename T = float> 
+export template<typename T> 
 class Polygon 
 { 
 private: 

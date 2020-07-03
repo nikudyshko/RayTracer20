@@ -7,7 +7,7 @@ import std.core;
 import vec; 
 
 // Struct to implement 4*4 matrix 
-export template<typename T = float> 
+export template<typename T> 
 struct Mat 
 { 
     // Matrix is represented as vector of column vectors (for now) 
