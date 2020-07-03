@@ -14,6 +14,8 @@ import saveppm;
 import material; 
 import render_constants; 
 
+import test; 
+
 export int main() 
 { 
 	std::vector< Vec<float> > pics(WIDTH*HEIGHT); 
@@ -64,9 +66,11 @@ export int main()
 	Ray<float> r = cam.get_next_ray(); 
 	const std::vector< Ray<float> > rays = cam.get_rays(); 
 
-	std::cout << r.origin << '\n' << r.dir << '\n'; 
-
-	std::cout << WIDTH*HEIGHT << ' ' << rays.size() << '\n' << rays[3].dir << '\n' << rays[3].origin << '\n'; 
+	Mat<float> CTW_1 = cam.get_ctw_matrix(); 
+	Vec<float> random_vec = -origin; 
+	random_vec.z = 0; 
+	random_vec += origin; 
+	Mat<float> CTW_2 = lookAt(origin, look_at, random_vec); 
 
 	return 0; 
 } 
