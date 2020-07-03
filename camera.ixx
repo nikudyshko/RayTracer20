@@ -9,7 +9,7 @@ import mat;
 import ray; 
 
 // Structure to implement a Camera 
-export template<typename T = float> 
+export template<typename T> 
 class Camera 
 { 
 private: 
@@ -92,12 +92,10 @@ public:
 		Vec<T> forward = (m_Origin - m_LookAt).normalize(); 
 
 		Vec<T> temp = m_Origin; 
-		temp.z = 0; 
+		temp.z = T(0); 
 		Vec<T> right = forward ^ (temp - m_Origin).normalize(); 
 
-		Vec<T> up = forward ^ right; 
-
-		std::cout << forward << '\n' << right << '\n' << up << '\n';  
+		Vec<T> up = forward ^ right;  
 
 		m_CTWMatrix = Mat<T>{ 
 			Vec<T>{    right.x, 	  up.x,  forward.x, T(0) }, 
@@ -117,8 +115,8 @@ public:
 		for (size_t i = 0; i < m_Width; ++i) 
 			for (size_t j = 0; j < m_Height; ++j) 
 			{ 
-				T dir_x = (2*(i + 0.5)/T(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
-				T dir_y = -(2*(j + 0.5)/T(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
+				T dir_x =  (T(2)*(T(i) + T(0.5))/T(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
+				T dir_y = -(T(2)*(T(j) + T(0.5))/T(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
 				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1) }.normalize(); 
 				m_Rays[i*m_Height + j] = Ray<T>{ m_Origin, dir_vec }; 
 			} 
@@ -144,4 +142,10 @@ public:
 	{ 
 		return m_Rays;  
 	} 
+
+	// Function to return camera-to-world matrix 
+	const Mat<T>& get_ctw_matrix() const 
+	{ 
+		return m_CTWMatrix; 
+	}
 }; 
