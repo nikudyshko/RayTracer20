@@ -9,7 +9,7 @@ import std.core;
 import custom_concepts; 
 
 // Vector structure. Implements a four-component vector 
-export template<typename T = float> 
+export template<typename T> 
 requires std::default_initializable<T> && sim_arithm<T> && math_fun<T> 
 struct Vec 
 { 
@@ -52,29 +52,51 @@ struct Vec
 	Vec (Vec<T>&& v) : 
 		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
 
+	// Copy assignment operator 
+	inline 
+	Vec<T>& operator= (const Vec<T>& rhs) 
+	{ 
+		x = rhs.x; 
+		y = rhs.y; 
+		z = rhs.z; 
+		w = rhs.w; 
+		return *this; 
+	} 
+
+	// Move assignment operator 
+	inline 
+	Vec<T>& operator= (const Vec<T>&& rhs) 
+	{ 
+		x = rhs.x; 
+		y = rhs.y; 
+		z = rhs.z; 
+		w = rhs.w; 
+		return *this; 
+	}
+
 	// Construct vector from a single scalar value 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec (U v) : 
 		x{T(v)}, y{T(v)}, z{T(v)}, w{T(v)} {} 
 
 	// Construct vector from a four scalar values 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec (U x_, U y_, U z_, U w_ = U()) : 
 		x{T(x_)}, y{T(y_)}, z{T(z_)}, w{T(w_)} {} 
 
 	// Construct vector from another vector with different inner type 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec (const Vec<U>& v) : 
 		x{T(v.x)}, y{T(v.y)}, z{T(v.z)}, w{T(v.w)} {} 
 
 	// Construct vector from another vector rvalue with different inner type 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec (Vec<U>&& v) : 
@@ -97,7 +119,7 @@ struct Vec
 	} 
 
 	// Assignment operator 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator= (const Vec<U>& rhs) 
@@ -109,8 +131,8 @@ struct Vec
 		return *this; 
 	} 
 
-	// Move assignement operato 
-	template<typename U = T> 
+	// Move assignement operator 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator= (Vec<U>&& rhs) 
@@ -122,8 +144,15 @@ struct Vec
 		return *this; 
 	} 
 
+	// Negation operator 
+	inline 
+	Vec<T> operator- () 
+	{ 
+		return { -x, -y, -z, -w }; 
+	} 
+
 	// Sum-assignment operator 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator+= (const Vec<U>& rhs) 
@@ -136,7 +165,7 @@ struct Vec
 	} 
 
 	// Sum-assignment operator with rvalue 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator+= (const Vec<U>&& rhs) 
@@ -149,7 +178,7 @@ struct Vec
 	}
 
 	// Substract-assignment operator 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator-= (const Vec<U>& rhs) 
@@ -162,7 +191,7 @@ struct Vec
 	} 
 
 	// Substract-assignment operator 
-	template<typename U = T> 
+	template<typename U> 
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator-= (const Vec<U>&& rhs) 
