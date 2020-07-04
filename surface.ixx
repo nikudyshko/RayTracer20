@@ -29,8 +29,6 @@ public:
     // Sets the optical properties of Surface 
     void set_opt_prop(const OpticalSurface<T>& s) { m_SurfOpt = OpticalSurface<T>(s); } 
 
-    // Interface function to get minimal coordinates of Polygon 
-    Vec<T> get_min_coords() { return m_Geom.get_min_coords(); } 
-    // Interface function to get maximal coordinates of Polygon 
-    Vec<T> get_max_coords() { return m_Geom.get_max_coords(); } 
+    // Returns the geometry of surface 
+    const Polygon<T>& get_polygon() const { return m_Geom; } 
 }; 
