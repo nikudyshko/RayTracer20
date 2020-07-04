@@ -45,23 +45,9 @@ public:
 		return m_Normal; 
 	} 
 
-	// Returns the minimal coordinates of polygon 
-	Vec<T> get_min_coords() 
-	{ 
-		T x = std::min(m_A.x, std::min(m_B.x, m_C.x)); 
-		T y = std::min(m_A.y, std::min(m_B.y, m_C.y)); 
-		T z = std::min(m_A.z, std::min(m_B.z, m_C.z)); 
-		return {x, y, z}; 
-	} 
-
-	// Returns the maximal coordinates of polygon 
-	Vec<T> get_max_coords() 
-	{ 
-		T x = std::max(m_A.x, std::max(m_B.x, m_C.x)); 
-		T y = std::max(m_A.y, std::max(m_B.y, m_C.y)); 
-		T z = std::max(m_A.z, std::max(m_B.z, m_C.z)); 
-		return {x, y, z}; 
-	} 
+	// Returns the coordinates of polygon 
+	std::tuple< Vec<T>, Vec<T>, Vec<T> > get_coords() const 
+	{ return { m_A, m_B, m_C }; } 
 
 	// Code to check if the ray intersects the Polygon, Moller-Trumbore algorithm 
 	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) 
