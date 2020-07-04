@@ -100,7 +100,7 @@ struct Vec
 	requires castable<T, U> 
 	inline 
 	Vec (Vec<U>&& v) : 
-		x{T(v.x)}, y{T(v.y)}, z{t(v.z)}, w{T(v.w)} {} 
+		x{T(v.x)}, y{T(v.y)}, z{T(v.z)}, w{T(v.w)} {} 
 
 	// Indexed access to vector components 
 	inline 
