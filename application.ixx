@@ -67,10 +67,7 @@ export int main()
 	const std::vector< Ray<float> > rays = cam.get_rays(); 
 
 	Mat<float> CTW_1 = cam.get_ctw_matrix(); 
-	Vec<float> random_vec = -origin; 
-	random_vec.z = 0; 
-	random_vec += origin; 
-	Mat<float> CTW_2 = lookAt(origin, look_at, random_vec); 
+	Mat<float> CTW_2 = lookAt(origin, look_at); 
 
 	return 0; 
 } 
