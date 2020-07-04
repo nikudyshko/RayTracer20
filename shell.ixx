@@ -59,21 +59,34 @@ public:
 	// Function to calculate bound sphere 
 	void calc_bound_sphere() 
 	{ 
-		Vec<T> min_point, max_point; 
+		Vec<T> center_point{}, dist_point{}; 
 		for (Surface<T>& s : m_Mesh) 
 		{ 
-			Vec<T> temp_min = s.get_min_coords(); 
-			Vec<T> temp_max = s.get_max_coords(); 
-
-			min_point.x = std::min(min_point.x, temp_min.x); 
-			min_point.y = std::min(min_point.y, temp_min.y); 
-			min_point.z = std::min(min_point.z, temp_min.z); 
-
-			max_point.x = std::max(max_point.x, temp_max.x); 
-			max_point.y = std::max(max_point.y, temp_max.y); 
-			max_point.z = std::max(max_point.z, temp_max.z); 
+			auto[p1, p2, p3] = s.get_polygon().get_coords(); 
+			center_point += (p1 + p2 + p3); 
 		} 
-		m_BoundRadius = T(0.5)*(max_point - min_point).length(); 
-		m_BoundOrigin = T(0.5)*(max_point + min_point); 
+
+		T s = 1/T(m_Mesh.size()); 
+		center_point.x *= s; 
+		center_point.y *= s; 
+		center_point.z *= s; 
+
+		T dist = T{}; 
+		for (Surface<T>& s : m_Mesh) 
+		{ 
+			auto[p1, p2, p3] = s.get_polygon().get_coords(); 
+
+			if ((p1 - center_point).length() > dist) 
+				dist = (p1 - center_point).length(); 
+			if ((p2 - center_point).length() > dist) 
+				dist = (p2 - center_point).length(); 
+			if ((p3 - center_point).length() > dist) 
+				dist = (p3 - center_point).length(); 
+		} 
+
+		m_BoundRadius = dist; 
+		m_BoundOrigin = center_point; 
+
+		std::cout << m_BoundRadius << '\n' << m_BoundOrigin << '\n'; 
 	} 
 }; 
