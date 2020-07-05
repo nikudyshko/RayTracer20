@@ -95,7 +95,9 @@ public:
 		temp.z = T(0); 
 		Vec<T> right = forward ^ (temp - m_Origin).normalize(); 
 
-		Vec<T> up = forward ^ right;  
+		Vec<T> up = forward ^ right; 
+
+		std::cout << forward << '\n' << up << '\n' << right << '\n'; 
 
 		m_CTWMatrix = Mat<T>{ 
 			Vec<T>{    right.x, 	  up.x,  forward.x, T(0) }, 
