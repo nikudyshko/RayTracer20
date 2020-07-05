@@ -17,10 +17,42 @@ struct Mat
     inline 
     Mat () {} 
 
+    // Copy constructor 
+    inline 
+    Mat (const Mat<T>& m) 
+    { 
+        for (auto& v : m.cols) 
+            cols.push_back(v); 
+    } 
+
+    // Move constructor 
+    inline 
+    Mat (Mat<T>&& m) 
+    { 
+        cols.swap(m.cols); 
+    }
+
     // Constructs Matrix out of four vectors 
     inline 
     Mat (std::initializer_list< Vec<T> > l) : 
         cols{l} {} 
+
+    // Copy-assignment operator 
+    inline 
+    Mat<T>& operator= (const Mat<T>& m) 
+    { 
+        for (auto& v : m.cols) 
+            cols.push_back(v); 
+        return *this; 
+    } 
+
+    // Move-assignment operator 
+    inline 
+    Mat<T>& operator= (Mat<T>&& m) 
+    { 
+        cols.swap(m.cols); 
+        return *this; 
+    }
 
     template<typename U> 
     inline 
@@ -28,6 +60,7 @@ struct Mat
     { 
         for (auto& v : m.cols) 
             cols.push_back(v); 
+        return *this; 
     } 
 }; 
 
