@@ -97,8 +97,6 @@ public:
 
 		Vec<T> up = forward ^ right; 
 
-		std::cout << forward << '\n' << up << '\n' << right << '\n'; 
-
 		m_CTWMatrix = Mat<T>{ 
 			Vec<T>{    right.x, 	  up.x,  forward.x, T(0) }, 
 			Vec<T>{    right.y, 	  up.y,  forward.y, T(0) }, 
