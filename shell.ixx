@@ -5,6 +5,7 @@ export module shell;
 import std.core; 
 
 import vec; 
+import ray; 
 import material; 
 import surface; 
 
@@ -86,7 +87,29 @@ public:
 
 		m_BoundRadius = dist; 
 		m_BoundOrigin = center_point; 
-
-		std::cout << m_BoundRadius << '\n' << m_BoundOrigin << '\n'; 
 	} 
+
+	// Calculatest ray-bound sphere intersection 
+	bool ray_intersect(const Ray<T>& ray) const 
+	{ 
+		Vec<T> L = m_BoundOrigin - ray.origin; 
+
+		T a = ray.dir*ray.dir; 
+		T b = T(2)*ray.dir*L; 
+		T c = L*L - m_BoundRadius*m_BoundRadius; 
+
+		if (T d = b*b - 4*a*c; (d == T(0)) && (-b / a >= T(0)))  
+			return true; 
+		else 
+			if (d >= T(0)) 
+			{ 
+				T x1 = (-b - std::sqrt(d))/(2*a);  
+				T x2 = (-b + std::sqrt(d))/(2*a); 
+
+				if ((x1 >= T(0)) || (x2 >= T(0))) 
+					return true; 
+			} 
+
+		return false; 
+	}
 }; 
