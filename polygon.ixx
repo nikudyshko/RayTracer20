@@ -30,7 +30,7 @@ public:
 		if (!m_HasNormal) 
 		{ 
 			m_V1 = m_B - m_A; 
-			m_V2 = m_C = m_A; 
+			m_V2 = m_C - m_A; 
 
 			m_Normal = (m_V1 ^ m_V2).normalize(); 
 			m_HasNormal = true; 
@@ -45,8 +45,8 @@ public:
 		return m_Normal; 
 	} 
 
-	// Returns the coordinates of polygon 
-	std::tuple< Vec<T>, Vec<T>, Vec<T> > get_coords() const 
+	// Returns the coordinates of Polygon 
+	std::vector< Vec<T> > get_coords() const 
 	{ return { m_A, m_B, m_C }; } 
 
 	// Code to check if the ray intersects the Polygon, Moller-Trumbore algorithm 
