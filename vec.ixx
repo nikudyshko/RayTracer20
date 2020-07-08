@@ -154,13 +154,6 @@ struct Vec
 		return *this; 
 	} 
 
-	// Negation operator 
-	inline 
-	Vec<T> operator- () 
-	{ 
-		return { -x, -y, -z, -w }; 
-	} 
-
 	// Scalar sum-assignment operator 
 	template<typename U> 
 	requires castable<T, U> 
@@ -266,6 +259,28 @@ struct Vec
 		return { x*s, y*s, z*s, w*s }; 
 	} 
 }; 
+
+// Negation operator 
+export template<typename T> 
+requires sim_arithm<T> 
+inline 
+Vec<T> operator- (const Vec<T>& v) 
+{ 
+	return { -v.x, -v.y, -v.z, -v.w }; 
+} 
+
+// Negation operator with rvalue 
+export template<typename T> 
+requires sim_arithm<T> 
+inline 
+Vec<T>& operator- (Vec<T>&& v) 
+{ 
+	v.x = -v.x; 
+	v.y = -v.y; 
+	v.z = -v.z; 
+	v.w = -v.w; 
+	return v; 
+} 
 
 // Scalar-vector multiplication 
 export template<typename T, typename U> 
@@ -409,38 +424,53 @@ auto operator+ (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x + rh
 
 // Vector-Vector addition with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator+ (const Vec<T>& lhs, const Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)> 
+auto operator+ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>& 
 { 
-	return { lhs.x + rhs.x, 
-			 lhs.y + rhs.y, 
-			 lhs.z + rhs.z, 
-			 lhs.w + lhs.w }; 
+	rhs.x += U(lhs.x); 
+	rhs.y += U(lhs.y); 
+	rhs.z += U(lhs.z); 
+	rhs.w += U(lhs.w); 
+	return rhs; 
 } 
 
 // Vector-Vector addition with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator+ (const Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x + rhs.x)> 
+auto operator+ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>& 
 { 
-	return { lhs.x + rhs.x, 
-			 lhs.y + rhs.y, 
-			 lhs.z + rhs.z, 
-			 lhs.w + rhs.w }; 
+	lhs.x += T(rhs.x); 
+	lhs.y += T(rhs.y); 
+	lhs.z += T(rhs.z); 
+	lhs.w += T(rhs.w); 
+	return lhs; 
 } 
 
 // Vector-Vector addition with rvalues 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<T> && sim_arithm<U> 
 inline 
-auto operator+ (const Vec<T>&& lhs, const Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)> 
+auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>& 
 { 
-	return { lhs.x + rhs.x, 
-			 lhs.y + rhs.y, 
-			 lhs.z + rhs.z, 
-			 lhs.w + rhs.w }; 
+	using W = decltype(lhs.x + rhs.x); 
+	if constexpr(std::is_same<T, W>::value) 
+	{ 
+		lhs.x += T(rhs.x); 
+		lhs.y += T(rhs.y); 
+		lhs.z += T(rhs.z); 
+		lhs.w += T(rhs.w); 
+		return lhs; 
+	} 
+	else 
+	{ 
+		rhs.x += U(lhs.x); 
+		rhs.y += U(lhs.y); 
+		rhs.z += U(lhs.z); 
+		rhs.w += U(lhs.w); 
+		return rhs; 
+	} 
 } 
 
 // Vector-Vector substraction 
