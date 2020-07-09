@@ -282,7 +282,7 @@ Vec<T>& operator- (Vec<T>&& v)
 	return v; 
 } 
 
-// Scalar-vector multiplication 
+// Scalar-Vector multiplication 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline 
@@ -292,17 +292,20 @@ auto operator* (T lhs, const Vec<U>& rhs) -> Vec<decltype(lhs*rhs.x)>
 			 lhs*rhs.z, lhs*rhs.w }; 
 } 
 
-// Scalar-vector multiplication with rvalue 
+// Scalar-Vector multiplication with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator* (T lhs, const Vec<U>&& rhs) ->Vec<decltype(lhs*rhs.x)> 
+auto operator* (T lhs, Vec<U>&& rhs) -> Vec<U>& 
 { 
-	return { lhs*rhs.x, lhs*rhs.y, 
-			 lhs*rhs.z, lhs*rhs.w }; 
+	rhs.x *= U(lhs); 
+	rhs.y *= U(lhs); 
+	rhs.z *= U(lhs); 
+	rhs.w *= U(lhs); 
+	return rhs; 
 } 
 
-// Vector-scalar multiplication 
+// Vector-Scalar multiplication 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline 
@@ -312,14 +315,17 @@ auto operator* (const Vec<T>& lhs, U rhs) -> Vec<decltype(lhs.x*rhs)>
 			 lhs.z*rhs, lhs.w*rhs }; 
 } 
 
-// Vector-scalar multiplication with rvalue 
+// Vector-Scalar multiplication with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<T> 
 inline 
-auto operator* (const Vec<T>&& lhs, U rhs) -> Vec<decltype(lhs.x*rhs)> 
+auto operator* (Vec<T>&& lhs, U rhs) -> Vec<T>& 
 { 
-	return { lhs.x*rhs, lhs.y*rhs, 
-			 lhs.z*rhs, lhs.w*rhs }; 
+	lhs.x *= T(rhs); 
+	lhs.y *= T(rhs); 
+	lhs.z *= T(rhs); 
+	lhs.w *= T(rhs); 
+	return lhs; 
 } 
 
 // Vector-Vector dot-product 
@@ -332,7 +338,7 @@ auto operator* (const Vec<T>& lhs, const Vec<U>& rhs) -> decltype(lhs.x*rhs.x)
 		   lhs.z*rhs.z + lhs.w*rhs.w; 
 } 
 
-// Vector-vector dot-product with rvalue 
+// Vector-Vector dot-product with rvalue 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline 
@@ -342,7 +348,7 @@ auto operator* (const Vec<T>& lhs, const Vec<U>&& rhs) -> decltype(lhs.x*rhs.x)
 		   lhs.z*rhs.z + lhs.w*rhs.w; 
 } 
 
-// Vector-vector dot-product with rvalue 
+// Vector-Vector dot-product with rvalue 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline 
@@ -352,7 +358,7 @@ auto operator* (const Vec<T>&& lhs, const Vec<U>& rhs) -> decltype(lhs.x*rhs.x)
 		   lhs.z*rhs.z + lhs.w*rhs.w; 
 } 
 
-// Vector-vector dot-product with rvalues 
+// Vector-Vector dot-product with rvalues 
 export template<typename T, typename U> 
 requires mut_arithm<T, U> 
 inline 
@@ -374,40 +380,55 @@ auto operator^ (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.
 			 lhs.x*rhs.y - lhs.y*rhs.x }; 
 } 
 
-// Vector-vector cross-product with rvalue 
+// Vector-Vector cross-product with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> && 
-		 requires (T t, U u) { std::default_initializable<decltype(t*u)>; } 
+requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator^ (const Vec<T>& lhs, const Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
+auto operator^ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>& 
 { 
-	return { lhs.y*rhs.z - lhs.z*rhs.y, 
-			 lhs.z*rhs.x - lhs.x*rhs.z, 
-			 lhs.x*rhs.y - lhs.y*rhs.x }; 
+	rhs = { U(lhs.y)*rhs.z - U(lhs.z)*rhs.y, 
+			U(lhs.z)*rhs.x - U(lhs.x)*rhs.z, 
+			U(lhs.x)*rhs.y - U(lhs.y)*rhs.x, 
+			U()	}; 
+	return rhs; 
 } 
 
-// Vector-vector cross-product with rvalue 
+// Vector-Vector cross-product with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> && 
-		 requires (T t, U u) { std::default_initializable<decltype(t*u)>; } 
+requires castable<T, U> && sim_arithm<T> 
 inline 
-auto operator^ (const Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
+auto operator^ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>& 
 { 
-	return { lhs.y*rhs.z - lhs.z*rhs.y, 
-			 lhs.z*rhs.x - lhs.x*rhs.z, 
-			 lhs.x*rhs.y - lhs.y*rhs.x }; 
+	lhs = { lhs.y*T(rhs.z) - lhs.z*T(rhs.y), 
+			lhs.z*T(rhs.x) - lhs.x*T(rhs.z), 
+			lhs.x*T(rhs.y) - lhs.y*T(rhs.x), 
+			T() }; 
+	return lhs; 
 } 
 
-// Vector-vector cross-product with rvalues 
+// Vector-Vector cross-product with rvalues 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> && 
-		 requires (T t, U u) { std::default_initializable<decltype(t*u)>; } 
+requires castable<T, U> && sim_arithm<T> && sim_arithm<U> 
 inline 
-auto operator^ (const Vec<T>&& lhs, const Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
+auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
 { 
-	return { lhs.y*rhs.z - lhs.z*rhs.y, 
-			 lhs.z*rhs.x - lhs.x*rhs.z, 
-			 lhs.x*rhs.y - lhs.y*rhs.x }; 
+	using W = decltype(lhs.x*rhs.y); 
+	if constexpr(std::is_same<W, T>) 
+	{ 
+		lhs = { lhs.y*T(rhs.z) - lhs.z*T(rhs.y), 
+				lhs.z*T(rhs.x) - lhs.x*T(rhs.z), 
+				lhs.x*T(rhs.y) - lhs.y*T(rhs.x), 
+				T() }; 
+		return lhs; 
+	} 
+	else 
+	{ 
+		rhs = { U(lhs.y)*rhs.z - U(lhs.z)*rhs.y, 
+				U(lhs.z)*rhs.z - U(lhs.x)*rhs.z, 
+				U(lhs.x)*rhs.y - U(lhs.y)*rhs.x, 
+				U() }; 
+		return rhs; 
+	} 
 } 
 
 // Vector-Vector addition 
@@ -487,38 +508,53 @@ auto operator- (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rh
 
 // Vector-Vector substraction with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator- (const Vec<T>& lhs, const Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
+auto operator- (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>& 
 { 
-	return { lhs.x - rhs.x, 
-			 lhs.y - rhs.y, 
-			 lhs.z - rhs.z, 
-			 lhs.w - rhs.w }; 
+	rhs.x -= U(lhs.x); 
+	rhs.y -= U(lhs.y); 
+	rhs.z -= U(lhs.z); 
+	rhs.w -= U(lhs.w); 
+	return -rhs; 
 } 
 
 // Vector-Vector substraction with rvalue 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<T> 
 inline 
-auto operator- (const Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
+auto operator- (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>& 
 { 
-	return { lhs.x - rhs.x, 
-			 lhs.y - rhs.y, 
-			 lhs.z - rhs.z, 
-			 lhs.w - rhs.w }; 
+	lhs.x -= T(rhs.x); 
+	lhs.y -= T(rhs.y); 
+	lhs.z -= T(rhs.z); 
+	lhs.w -= T(rhs.w); 
+	return lhs; 
 } 
 
 // Vector-Vector substraction with rvalues 
 export template<typename T, typename U> 
-requires mut_arithm<T, U> 
+requires castable<T, U> && sim_arithm<T> && sim_arithm<U> 
 inline 
-auto operator- (const Vec<T>&& lhs, const Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
+auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
 { 
-	return { lhs.x - rhs.x, 
-			 lhs.y - rhs.y, 
-			 lhs.z - rhs.z, 
-			 lhs.w - rhs.w }; 
+	using W = decltype(lhs.x - rhs.x); 
+	if constexpr(std::is_same<W, T>) 
+	{ 
+		lhs.x -= T(rhs.x); 
+		lhs.y -= T(rhs.y); 
+		lhs.z -= T(rhs.z); 
+		lhs.w -= T(rhs.w); 
+		return lhs; 
+	} 
+	else 
+	{ 
+		rhs.x -= U(lhs.x); 
+		rhs.y -= U(lhs.y); 
+		rhs.z -= U(lhs.z); 
+		rhs.w -= U(lhs.w); 
+		return -rhs; 
+	} 
 } 
 
 // Vector output operator 
