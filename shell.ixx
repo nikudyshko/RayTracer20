@@ -33,7 +33,6 @@ private:
 
 	// Rays, that hit Bound Sphere. Should be 
 	// properly traced against every Surface element 
-
 	std::vector< Vec<T> > m_TestRays{}; 
 
 	// Inner Shells  
