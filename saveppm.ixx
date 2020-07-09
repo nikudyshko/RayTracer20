@@ -15,10 +15,10 @@ void save_ppm(
 ) 
 { 
 	std::ofstream output; 
-	output.open("./render.ppm", std::ios::out || std::ios::binary); 
+	output.open("./render.ppm", std::ios::out | std::ios::binary); 
 	output << "P6\n" << width << ' ' << height << "\n255\n"; 
 	for (size_t i = 0; i < width*height; ++i) 
 		for (size_t j = 0; j < 3; ++j) 
-			output << char(255*std::max(0.f, std::min(1.f, framebuffer[i][j])));  
+			output << char(255*std::max(0.0f, std::min(1.0f, framebuffer[i][j])));  
 	output.close(); 
 }
