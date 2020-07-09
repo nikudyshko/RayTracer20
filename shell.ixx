@@ -46,7 +46,10 @@ public:
 		m_BulkOpt{bulk_opt}, m_Mesh{} {} 
 	// Constructs a Shell from only mesh 
 	Shell(std::initializer_list< Surface<T> > mesh) : 
-		m_BulkOpt{}, m_Mesh(mesh), m_HasMesh{true} {}; 
+		m_BulkOpt{}, m_Mesh{mesh}, m_HasMesh{true} {} 
+	// Constructs a Shell from other Shells 
+	Shell(std::initializer_list< Shell<T> > inner_shells) : 
+		m_BulkOpt{}, m_Mesh{}, m_InnerShells{inner_shells} {} 
 
 	// Function to set optical properties 
 	void set_opt_prop(const OpticalBulk<T>& bulk_opt) { m_BulkOpt = OpticalBulk<T>(bulk_opt); } 
@@ -99,9 +102,9 @@ public:
 
 			std::cout << m_BoundRadius << '\n' << m_BoundOrigin << '\n'; 
 		}
-	}
+	} 
 
-	// Calculatest ray-bound sphere intersection 
+	// Calculates ray-bound sphere intersection 
 	bool ray_intersect(const Ray<T>& ray) const 
 	{ 
 		Vec<T> L = m_BoundOrigin - ray.origin; 
@@ -110,18 +113,16 @@ public:
 		T b = T(2)*ray.dir*L; 
 		T c = L*L - m_BoundRadius*m_BoundRadius; 
 
-		if (T d = b*b - 4*a*c; (d == T(0)) && (-b / a >= T(0)))  
-			return true; 
-		else 
-			if (d >= T(0)) 
-			{ 
-				T x1 = (-b - std::sqrt(d))/(2*a);  
-				T x2 = (-b + std::sqrt(d))/(2*a); 
+		if (T d = b*b - T(4)*a*c; d > T(0)) 
+		{ 
+			T sd = std::sqrt(d); 
+			T t1 = (-b - sd)/(2*a); 
+			T t2 = (-b + sd)/(2*a); 
 
-				if ((x1 >= T(0)) || (x2 >= T(0))) 
-					return true; 
-			} 
+			if ((x1 >= T(0)) || (x2 >= T(0))) 
+				return true; 
+		} 
 
 		return false; 
-	}
+	} 
 }; 
