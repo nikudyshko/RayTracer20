@@ -47,11 +47,6 @@ struct Vec
 	Vec (const Vec<T>& v) : 
 		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
 
-	// Move constructor 
-	inline 
-	Vec (Vec<T>&& v) : 
-		x{v.x}, y{v.y}, z{v.z}, w{v.w} {} 
-
 	// Copy assignment operator 
 	inline 
 	Vec<T>& operator= (const Vec<T>& rhs) 
@@ -62,17 +57,6 @@ struct Vec
 		w = rhs.w; 
 		return *this; 
 	} 
-
-	// Move assignment operator 
-	inline 
-	Vec<T>& operator= (const Vec<T>&& rhs) 
-	{ 
-		x = rhs.x; 
-		y = rhs.y; 
-		z = rhs.z; 
-		w = rhs.w; 
-		return *this; 
-	}
 
 	// Construct vector from a single scalar value 
 	template<typename U> 
@@ -141,19 +125,6 @@ struct Vec
 		return *this; 
 	} 
 
-	// Move-assignment operator with rvalue 
-	template<typename U> 
-	requires castable<T, U> 
-	inline 
-	Vec<T>& operator= (Vec<U>&& rhs) 
-	{ 
-		x = T(rhs.x); 
-		y = T(rhs.y); 
-		z = T(rhs.z); 
-		w = T(rhs.w); 
-		return *this; 
-	} 
-
 	// Scalar sum-assignment operator 
 	template<typename U> 
 	requires castable<T, U> 
@@ -180,19 +151,6 @@ struct Vec
 		return *this; 
 	} 
 
-	// SUm-assignment operator with rvalue 
-	template<typename U> 
-	requires castable<T, U> 
-	inline 
-	Vec<T>& operator+= (const Vec<U>&& rhs) 
-	{ 
-		x += T(rhs.x); 
-		y += T(rhs.y); 
-		z += T(rhs.z); 
-		w += T(rhs.w);  
-		return *this; 
-	} 
-
 	// Scalar substract-assignment operator 
 	template<typename U> 
 	requires castable<T, U> 
@@ -211,19 +169,6 @@ struct Vec
 	requires castable<T, U> 
 	inline 
 	Vec<T>& operator-= (const Vec<U>& rhs) 
-	{ 
-		x -= T(rhs.x); 
-		y -= T(rhs.y); 
-		z -= T(rhs.z); 
-		w -= T(rhs.w); 
-		return *this; 
-	} 
-
-	// Substract-assignment operator with rvalue 
-	template<typename U> 
-	requires castable<T, U> 
-	inline 
-	Vec<T>& operator-= (const Vec<U>&& rhs) 
 	{ 
 		x -= T(rhs.x); 
 		y -= T(rhs.y); 
