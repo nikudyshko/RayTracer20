@@ -50,7 +50,7 @@ public:
 	{ return { m_A, m_B, m_C }; } 
 
 	// Code to check if the ray intersects the Polygon, Moller-Trumbore algorithm 
-	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) 
+	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) const 
 	{ 
 		if (!m_HasNormal) 
 			calc_normal(); 
