@@ -104,7 +104,7 @@ public:
 	} 
 
 	// Calculates ray-bound sphere intersection 
-	bool ray_intersect(const Ray<T>& ray) const 
+	bool hit_sphere(const Ray<T>& ray) const 
 	{ 
 		Vec<T> L = m_BoundOrigin - ray.origin; 
 
@@ -124,4 +124,13 @@ public:
 
 		return false; 
 	} 
+
+	// Traces the Ray 
+	Vec<T> trace(const Ray<T>& r) 
+	{ 
+		Vec<T> point;  
+		for (Surface<T>& s : m_Mesh) 
+			if (s.get_polygon().ray_intersect(r, point)) 
+				return s.get_color(point); 
+	}
 }; 
