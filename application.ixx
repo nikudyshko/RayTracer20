@@ -67,7 +67,6 @@ export int main()
 	const std::vector< Ray<float> > rays = cam.get_rays(); 
 
 	Mat<float> CTW_1 = cam.get_ctw_matrix(); 
-	//Mat<float> CTW_2 = lookAt(origin, look_at); 
 
 	create_pic(); 
 
