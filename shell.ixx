@@ -59,13 +59,17 @@ public:
 		m_HasMesh = true; 
 	} 
 	// Function to set a complete mesh 
-	template<typename Container > 
+	template<typename Container> 
 	void add_surfaces(const Container& mesh) 
 	{ 
 		m_Mesh.clear(); 
 		std::copy(mesh.begin(), mesh.end(), std::back_inserter(m_Mesh)); 
 		m_HasMesh = true; 
 	} 
+
+	// Returns a list of inner Shells 
+	const std::vector< Shell<T> > get_inner_shells() const 
+	{ return m_InnerShells; } 
 
 	// Function to calculate bound sphere 
 	void calc_bound_sphere() 
