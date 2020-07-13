@@ -8,6 +8,10 @@ import vec;
 export template<typename T> 
 struct Ray 
 { 
+	// Intensity of the light 
+	T intensity{}; 
+	// Color of the light 
+	Vec<T> color{};  
 	// origin - origin of the ray 
 	// dir - direction of ray 
 	Vec<T> origin{}, dir{}; 
