@@ -1,5 +1,7 @@
 module; 
 
+#include <cassert> 
+
 export module shell; 
 
 import std.core; 
@@ -19,6 +21,8 @@ class Shell
 private: 
 	// Flag to check if the Shell has mesh 
 	bool m_HasMesh{false}; 
+	// Flag to check if the Shell has Bound Sphere 
+	bool m_HasBoundSphere{false}; 
 	// Bound Sphere radius 
 	T m_BoundRadius{}; 
 
@@ -62,13 +66,14 @@ public:
 	template<typename Container> 
 	void add_surfaces(const Container& mesh) 
 	{ 
+		assert((std::is_same<Container::value_type, Surface<T>>::value)); 
 		m_Mesh.clear(); 
 		std::copy(mesh.begin(), mesh.end(), std::back_inserter(m_Mesh)); 
 		m_HasMesh = true; 
 	} 
 
-	// Returns a list of inner Shells 
-	const std::vector< Shell<T> > get_inner_shells() const 
+	// Returns a vector of inner Shells 
+	const std::vector< Shell<T> >& get_inner_shells() const 
 	{ return m_InnerShells; } 
 
 	// Sets the bound sphere 
@@ -76,47 +81,49 @@ public:
 	{ 
 		m_BoundRadius = bound_radius; 
 		m_BoundOrigin = bound_origin; 
+		m_HasBoundSphere = true; 
 	}
 
 	// Function to calculate bound sphere 
 	void calc_bound_sphere() 
 	{ 
-		if (m_HasMesh) 
+		assert(m_HasMesh); 
+		Vec<T> center_point{}; 
+		for (Surface<T>& s : m_Mesh) 
 		{ 
-			Vec<T> center_point{}; 
-			for (Surface<T>& s : m_Mesh) 
+			std::vector< Vec<T> > ps = s.get_polygon().get_coords(); 
+
+			for (Vec<T>& p : ps) 
+				center_point += p; 
+		} 
+
+		T s = 1/T(m_Mesh.size()); 
+		center_point *= s; 
+
+		T dist = T{}; 
+		for (Surface<T>& s : m_Mesh) 
+		{ 
+			std::vector< Vec<T> > ps = s.get_polygon().get_coords(); 
+
+			for (Vec<T>& p : ps) 
 			{ 
-				std::vector< Vec<T> > ps = s.get_polygon().get_coords(); 
-
-				for (Vec<T>& p : ps) 
-					center_point += p; 
-			} 
-
-			T s = 1/T(m_Mesh.size()); 
-			center_point *= s; 
-
-			T dist = T{}; 
-			for (Surface<T>& s : m_Mesh) 
-			{ 
-				std::vector< Vec<T> > ps = s.get_polygon().get_coords(); 
-
-				for (Vec<T>& p : ps) 
-				{ 
-					if (T l = (p - center_point).length(); l > dist) 
+				if (T l = (p - center_point).length(); l > dist) 
 					dist = l; 
-				}
-			} 
+			}
+		} 
 
-			m_BoundRadius = dist; 
-			m_BoundOrigin = center_point; 
+		m_BoundRadius = dist; 
+		m_BoundOrigin = center_point; 
 
-			std::cout << m_BoundRadius << '\n' << m_BoundOrigin << '\n'; 
-		}
+		m_HasBoundSphere = true; 
+
+		std::cout << m_BoundRadius << '\n' << m_BoundOrigin << '\n'; 
 	} 
 
 	// Calculates ray-bound sphere intersection 
 	bool hit_sphere(const Ray<T>& ray) const 
 	{ 
+		assert(m_HasBoundSphere); 
 		Vec<T> L = m_BoundOrigin - ray.origin; 
 
 		T a = ray.dir*ray.dir; 
@@ -129,7 +136,7 @@ public:
 			T t1 = (-b - sd)/(2*a); 
 			T t2 = (-b + sd)/(2*a); 
 
-			if ((x1 >= T(0)) || (x2 >= T(0))) 
+			if ((t1 >= T(0)) || (t2 >= T(0))) 
 				return true; 
 		} 
 
@@ -139,6 +146,7 @@ public:
 	// Traces the Ray 
 	Vec<T> trace(const Ray<T>& r) 
 	{ 
+		assert(m_HasMesh); 
 		Vec<T> point;  
 		for (Surface<T>& s : m_Mesh) 
 			if (s.get_polygon().ray_intersect(r, point)) 
