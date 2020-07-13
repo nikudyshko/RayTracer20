@@ -71,6 +71,13 @@ public:
 	const std::vector< Shell<T> > get_inner_shells() const 
 	{ return m_InnerShells; } 
 
+	// Sets the bound sphere 
+	void set_bound_sphere(T bound_radius, const Vec<T>& bound_origin) 
+	{ 
+		m_BoundRadius = bound_radius; 
+		m_BoundOrigin = bound_origin; 
+	}
+
 	// Function to calculate bound sphere 
 	void calc_bound_sphere() 
 	{ 
