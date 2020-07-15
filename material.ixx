@@ -33,6 +33,9 @@ struct OpticalBulk
 	// transparency - transparency parameter 
 	T refraction{}, transparency{}; 
 
+	// Bulk color 
+	Vec<T> color{}; 
+
 	// Default constructor 
 	OpticalBulk() {} 
 	// Constructs properties from refraction and transparency parameters 
