@@ -13,9 +13,9 @@ import shell;
 template<typename T> 
 struct RenderNode 
 { 
-    RenderNode<T>* parent_node{nullptr}; 
-    std::vector< RenderNode<T>* > child_nodes{}; 
-    Shell<T> sh{}; 
+    std::shared_ptr< RenderNode<T> > parent_node{nullptr}; 
+    std::vector< std::shared_ptr< RenderNode<T> > child_nodes{}; 
+    SHell<T> sh{}; 
 }; 
 
 // Class to implement a rendering cycle 
