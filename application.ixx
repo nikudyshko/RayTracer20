@@ -12,6 +12,7 @@ import polygon;
 import surface; 
 import saveppm; 
 import material; 
+import renderer; 
 import render_constants; 
 
 import test; 
@@ -42,6 +43,13 @@ export int main()
 	Polygon<float> p3{v3, v0, v4}; 
 	Polygon<float> p4{v0, v2, v1}; 
 	Polygon<float> p5{v0, v3, v2}; 
+	p0.calc_normal(); 
+	p1.calc_normal(); 
+	p2.calc_normal(); 
+	p3.calc_normal(); 
+	p4.calc_normal(); 
+	p5.calc_normal(); 
+
 
 	Surface<float> s0{p0, opt_s}; 
 	Surface<float> s1{p1, opt_s}; 
@@ -57,18 +65,18 @@ export int main()
 	sh.add_surfaces(mesh); 
 	sh.calc_bound_sphere(); 
 
-	Vec<float> origin{1.0f, 1.0f, 1.0f}; 
+	Vec<float> origin{8.0f, 8.0f, 8.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
 
-	Camera<float> cam{WIDTH, HEIGHT, 3.14f/2.0f, origin, look_at}; 
+	Camera<float> cam{WIDTH, HEIGHT, 3.14f/3.0f, origin, look_at}; 
 	cam.calc_matrix(); 
 	cam.calc_rays(); 
-	Ray<float> r = cam.get_next_ray(); 
-	const std::vector< Ray<float> > rays = cam.get_rays(); 
 
-	Mat<float> CTW_1 = cam.get_ctw_matrix(); 
-
-	create_pic(); 
+	Renderer<float> rend{}; 
+	rend.set_camera(cam); 
+	rend.set_scene(sh); 
+	rend.build_rendering_tree(); 
+	rend.render(); 
 
 	return 0; 
 } 
