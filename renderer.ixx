@@ -9,13 +9,14 @@ import std.core;
 import vec; 
 import ray; 
 import shell; 
+import camera; 
 
 template<typename T> 
 struct RenderNode 
 { 
-    std::shared_ptr< RenderNode<T> > parent_node{nullptr}; 
-    std::vector< std::shared_ptr< RenderNode<T> > child_nodes{}; 
-    SHell<T> sh{}; 
+    RenderNode<T>* parent_node{nullptr}; 
+    std::vector< RenderNode<T>* > child_nodes{}; 
+    Shell<T> sh{}; 
 }; 
 
 // Class to implement a rendering cycle 
@@ -29,6 +30,8 @@ private:
     bool m_HasScene{false}; 
     // Flag to show if the Renderer has a Rendering Tree 
     bool m_HasRenderingTree{false}; 
+    // Camera resolution 
+    size_t m_Width{}, m_Height{}; 
     // Camera 
     Camera<T> m_Camera{}; 
     // Shell, that contains other shells and represents a scene 
@@ -37,17 +40,17 @@ private:
     RenderNode<T>* m_RenderingTree{nullptr}; 
 
     // Function, that performs a recurrent build of rendering tree 
-    RenderNode<T>* add_render_nodes(const RenderNode<T>* parent_node, const Shell<T>& sh) 
+    RenderNode<T>* add_render_nodes(RenderNode<T>* parent_node, const Shell<T>& sh) 
     { 
         RenderNode<T>* node = new RenderNode<T>(); 
-        
+
         node->parent_node = parent_node; 
         node->sh = sh; 
 
         const std::vector< Shell<T> >& inner_shells = sh.get_inner_shells(); 
-        for (const Shell<T>& shell : inners_shells) 
+        for (const Shell<T>& shell : inner_shells) 
         { 
-            RenerNode<T>* child_node = add_render_nodes(node, shell); 
+            RenderNode<T>* child_node = add_render_nodes(node, shell); 
             node->child_nodes.push_back(child_node); 
         } 
 
@@ -55,18 +58,39 @@ private:
     } 
 
     // Function, that performs recurrent ray-tracing 
-    void ray_trace() {}; 
+    void ray_trace(std::vector< Ray<T> >& rays, std::vector< Vec<T> >& framebuffer, RenderNode<T>* render_node)  
+    { 
+        size_t hited = 0; 
+        size_t traced = 0; 
+        for (Ray<T>& r : rays) 
+        { 
+            if (render_node->sh.hit_sphere(r))  
+            { 
+                ++hited; 
+                render_node->sh.trace(r); 
+            } 
+            if ((r.pc.x*m_Height + r.pc.y) == 8) 
+            { 
+                std::cout << "8\n"; 
+                framebuffer[r.pc.x*m_Height + r.pc.x] = r.color; 
+                std::cout << r.color << '\n' << framebuffer[r.pc.x*m_Height + r.pc.y] << '\n'; 
+            } 
+        } 
+        std::cout << framebuffer[8] << '\n'; 
+        std::cout << "Hited: " << hited << '\n'; 
+        std::cout << "Traced: " << traced << '\n'; 
+    }
 public: 
     // Default constructor 
     Renderer() {} 
-    // Constructs a Renderer from a Shell 
-    Renderer(Shell<T> sh) : 
-        scene{sh} {} 
 
     // Sets the Camera 
     void set_camera(const Camera<T>& camera) 
     { 
         m_Camera = camera; 
+        auto[w, h] = m_Camera.get_resolution(); 
+        m_Width = w; 
+        m_Height = h; 
         m_HasCamera = true; 
     } 
 
@@ -88,7 +112,7 @@ public:
     // Function, that performs a rendering 
     void render() 
     { 
-        assert(m_HasCamera && m_HasScene && m_HasRenderTree); 
+        assert(m_HasCamera && m_HasScene && m_HasRenderingTree); 
         const std::vector< Ray<T> >& rays = m_Camera.get_rays(); 
         std::vector< Vec<T> > framebuffer(rays.size()); 
 
@@ -102,11 +126,13 @@ public:
         std::vector< std::thread > threads(core_count); 
 
         for (size_t i = 0; i < core_count; ++i) 
-            threads[i] = std::thread(&Renderer::ray_trace, this, i, thread_rays[i], framebuffer); 
+            this->ray_trace(thread_rays[i], framebuffer, m_RenderingTree); 
+            //threads[i] = std::thread(&Renderer::ray_trace, this, thread_rays[i], framebuffer, m_RenderingTree); 
         
-        for (std::thread& t : threads) 
-            threads[i].join(); 
+        //for (std::thread& t : threads) 
+        //    t.join(); 
 
-        save_ppm(WIDTH, HEIGHT, framebuffer); 
+        std::cout << framebuffer[8] << '\n'; 
+        save_ppm(m_Width, m_Height, framebuffer); 
     } 
 }; 
