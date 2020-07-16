@@ -10,8 +10,8 @@ import vec;
 export template<typename T> 
 struct Mat 
 { 
-    // Matrix is represented as vector of column vectors (for now) 
-    std::vector< Vec<T> > cols{}; 
+    // Matrix is represented as vector of row vectors (for now) 
+    std::vector< Vec<T> > rows{}; 
 
     // Default constructor 
     inline 
@@ -21,28 +21,28 @@ struct Mat
     inline 
     Mat (const Mat<T>& m) 
     { 
-        for (auto& v : m.cols) 
-            cols.push_back(v); 
+        for (auto& v : m.rows) 
+            rows.push_back(v); 
     } 
 
     // Move constructor 
     inline 
     Mat (Mat<T>&& m) 
     { 
-        cols.swap(m.cols); 
+        rows.swap(m.rows); 
     }
 
     // Constructs Matrix out of four vectors 
     inline 
     Mat (std::initializer_list< Vec<T> > l) : 
-        cols{l} {} 
+        rows{l} {} 
 
     // Copy-assignment operator 
     inline 
     Mat<T>& operator= (const Mat<T>& m) 
     { 
-        for (auto& v : m.cols) 
-            cols.push_back(v); 
+        for (auto& v : m.rows) 
+            rows.push_back(v); 
         return *this; 
     } 
 
@@ -50,7 +50,8 @@ struct Mat
     inline 
     Mat<T>& operator= (Mat<T>&& m) 
     { 
-        cols.swap(m.cols); 
+        rows.swap(m.rows); 
+        m.rows.clear(); 
         return *this; 
     }
 
@@ -58,22 +59,22 @@ struct Mat
     inline 
     Mat<T>& operator= (const Mat<U>& m) 
     { 
-        for (auto& v : m.cols) 
-            cols.push_back(v); 
+        for (auto& v : m.rows) 
+            rows.push_back(v); 
         return *this; 
     } 
 }; 
 
 // Matrix-Vector multiplication 
 export template<typename T, typename U> 
-auto operator* (const Mat<T>& m, const Vec<U>& v) -> Vec<decltype(m.cols[0].x*v.x)> 
+auto operator* (const Mat<T>& m, const Vec<U>& v) -> Vec<decltype(m.rows[0].x*v.x)> 
 { 
-    using W = decltype(m.cols[0].x*v.x); 
+    using W = decltype(m.rows[0].x*v.x); 
 
     Vec<W> res{}; 
 
-    for (size_t i = 0; i < m.cols.size(); ++i) 
-        res[i] = m.cols[i]*v; 
+    for (size_t i = 0; i < m.rows.size(); ++i) 
+        res[i] = m.rows[i]*v; 
 
     return res; 
 }
