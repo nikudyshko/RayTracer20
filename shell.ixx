@@ -144,12 +144,16 @@ public:
 	} 
 
 	// Traces the Ray 
-	Vec<T> trace(const Ray<T>& r) 
+	bool trace(Ray<T>& r) 
 	{ 
 		assert(m_HasMesh); 
 		Vec<T> point;  
-		for (Surface<T>& s : m_Mesh) 
+		for (const Surface<T>& s : m_Mesh) 
 			if (s.get_polygon().ray_intersect(r, point)) 
-				return s.get_color(point); 
+			{ 
+				r.color = s.get_color(point); 
+				return true; 
+			} 
+		return false; 
 	}
 }; 
