@@ -29,6 +29,8 @@ public:
     // Sets the optical properties of Surface 
     void set_opt_prop(const OpticalSurface<T>& s) { m_SurfOpt = OpticalSurface<T>(s); } 
 
-    // Returns the geometry of surface 
-    const Polygon<T>& get_polygon() const { return m_Geom; } 
+    // Returns the geometry of Surface  
+    const Polygon<T>& get_polygon() const noexcept { return m_Geom; } 
+    // Returns the color of Surface color of given coordinates 
+    Vec<T> get_color(const Vec<T>& coords) const noexcept { return m_SurfOpt.color; } 
 }; 
