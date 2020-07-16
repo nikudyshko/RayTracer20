@@ -16,6 +16,9 @@ struct Ray
 	// dir - direction of ray 
 	Vec<T> origin{}, dir{}; 
 
+	// Pixel coordinates for Camera ray 
+	Vec<T> pc{};  
+
 	// Default constructor 
 	inline 
 	Ray () {} 
