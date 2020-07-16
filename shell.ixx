@@ -116,8 +116,6 @@ public:
 		m_BoundOrigin = center_point; 
 
 		m_HasBoundSphere = true; 
-
-		std::cout << m_BoundRadius << '\n' << m_BoundOrigin << '\n'; 
 	} 
 
 	// Calculates ray-bound sphere intersection 
