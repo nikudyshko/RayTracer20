@@ -34,9 +34,9 @@ private:
 public: 
 	// Default constructor 
 	inline 
-	Camera() = delete; 
+	Camera() {} 
 
-	// COnstruct a Camera width width, height, 
+	// Construct a Camera width width, height, 
 	// FOV and origin, look-at parameters 
 	inline 
 	Camera(size_t width, 
@@ -91,8 +91,8 @@ public:
 	{ 
 		Vec<T> forward = (m_Origin - m_LookAt).normalize(); 
 
-		Vec<T> temp = m_Origin; 
-		temp.z = T(0); 
+		Vec<T> temp = {0.0f, 1.0f, 0.0f}; //m_Origin; 
+		// temp.z = T(0); 
 		Vec<T> right = forward ^ (temp - m_Origin).normalize(); 
 
 		Vec<T> up = forward ^ right; 
@@ -119,32 +119,40 @@ public:
 				T dir_y = -(T(2)*(T(j) + T(0.5))/T(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
 				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1) }.normalize(); 
 				m_Rays[i*m_Height + j] = Ray<T>{ m_Origin, dir_vec }; 
+				m_Rays[i*m_Height + j].pc = {T(i), T(j), T(0), T(0)}; 
+				m_Rays[i*m_Height + j].color = {0.2f, 0.3f, 0.7f}; 
 			} 
 
 		m_HasRays = true; 
 	} 
 
-	// Function return a single Ray 
-	const Ray<T>& get_next_ray() const 
+	// Returns a Camera resolution 
+	std::tuple<size_t, size_t> get_resolution() const noexcept 
 	{ 
-		if (m_HasRays) 
-		{ 
-			m_CurrentRay = (m_CurrentRay + 1) % m_Rays.size(); 
+		return { m_Width, m_Height }; 
+	}
 
-			return m_Rays[m_CurrentRay]; 
-		} 
+	// Function return a single Ray 
+	// const Ray<T>& get_next_ray() const 
+	// { 
+	// 	if (m_HasRays) 
+	// 	{ 
+	// 		m_CurrentRay = (m_CurrentRay + 1) % m_Rays.size(); 
 
-		return Ray<T>{}; 
-	} 
+	// 		return m_Rays[m_CurrentRay]; 
+	// 	} 
+
+	// 	return Ray<T>{}; 
+	// } 
 
 	// Function to return a whole array of Rays 
-	const std::vector< Ray<T> >& get_rays() const 
+	const std::vector< Ray<T> >& get_rays() const noexcept 
 	{ 
 		return m_Rays;  
 	} 
 
 	// Function to return camera-to-world matrix 
-	const Mat<T>& get_ctw_matrix() const 
+	const Mat<T>& get_ctw_matrix() const noexcept 
 	{ 
 		return m_CTWMatrix; 
 	}
