@@ -6,6 +6,7 @@ import std.core;
 
 import vec; 
 import ray; 
+import mat; 
 import shell; 
 import camera;  
 import polygon; 
@@ -17,12 +18,21 @@ import render_constants;
 
 import test; 
 
+template<typename T> 
+void fill_pic(std::vector< Vec<T> >& px) 
+{ 
+	for (int j = 0; j < HEIGHT; ++j) 
+		for (int i = 0; i < WIDTH; ++i) 
+			px[j*WIDTH + i] = { i/T(WIDTH), j/T(HEIGHT), T(0), T(0) }; 
+}
+
 export int main() 
 { 
 	std::vector< Vec<float> > pics(WIDTH*HEIGHT); 
-	for (int j = 0; j < HEIGHT; ++j) 
-		for (int i = 0; i < WIDTH; ++i) 
-			pics[j*WIDTH + i] = { j/float(HEIGHT), i/float(WIDTH), 0.0f, 0.0f }; 
+	// for (int j = 0; j < HEIGHT; ++j) 
+	// 	for (int i = 0; i < WIDTH; ++i) 
+	// 		pics[j*WIDTH + i] = { j/float(HEIGHT), i/float(WIDTH), 0.0f, 0.0f }; 
+	fill_pic(pics); 
 	save_ppm(WIDTH, HEIGHT, pics); 
 
 	Vec<float> v0{ 0.5f,  0.0f, 0.0f }; 
