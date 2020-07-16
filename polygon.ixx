@@ -1,5 +1,7 @@
 module; 
 
+#include <cassert> 
+
 export module polygon; 
 
 import std.core; 
@@ -38,10 +40,9 @@ public:
 	} 
 
 	// Returns the normal vector of polygon 
-	const Vec<T>& get_normal () 
+	const Vec<T>& get_normal () const 
 	{ 
-		if (!m_HasNormal) 
-			calc_normal(); 
+		assert(m_HasNormal); 
 		return m_Normal; 
 	} 
 
@@ -49,11 +50,12 @@ public:
 	std::vector< Vec<T> > get_coords() const 
 	{ return { m_A, m_B, m_C }; } 
 
-	// Code to check if the ray intersects the Polygon, Moller-Trumbore algorithm 
-	bool ray_intersect (const Vec<T>& ray, Vec<T>& x_point) const 
+	// Code to checl if the Ray intersects the Polygon, Moller-Trumbore algortihm 
+	bool ray_intersect (const Ray<T>& ray, Vec<T>& x_point) const 
 	{ 
-		if (!m_HasNormal) 
-			calc_normal(); 
+		assert(m_HasNormal); 
+
+		static size_t tracing = 0; 
 
 		Vec<T> p_v = ray.dir ^ m_V2; 
 		T det = m_V1 * p_v; 
@@ -71,17 +73,17 @@ public:
 				T inv_det = 1 / det; 
 
 				Vec<T> t_v = ray.origin - m_A; 
-				x_point.u = inv_det * t_v * p_v; 
+				x_point.u = inv_det * (t_v * p_v); 
 				if (x_point.u < 0 || x_point.u > 1) 
 					return false; 
 
 				Vec<T> q_v = t_v ^ m_V1; 
-				x_point.v = inv_det * ray.dir * q_v; 
+				x_point.v = inv_det * (ray.dir * q_v); 
 
 				if (x_point.v < 0 || x_point.u + x_point.v > 1) 
 					return false; 
 
-				x_point.t = inv_det * m_V2 * q_v; 
+				x_point.t = inv_det * (m_V2 * q_v); 
 
 				return true; 
 			} 
