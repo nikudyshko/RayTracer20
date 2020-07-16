@@ -89,19 +89,19 @@ public:
 	// Function to calculate camera-to-world matrix 
 	void calc_matrix() 
 	{ 
-		Vec<T> forward = (m_Origin - m_LookAt).normalize(); 
+		Vec<T> dir = (m_Origin - m_LookAt).normalize(); 
 
-		Vec<T> temp = {0.0f, 1.0f, 0.0f}; //m_Origin; 
-		// temp.z = T(0); 
-		Vec<T> right = forward ^ (temp - m_Origin).normalize(); 
+		Vec<T> up = {0.0f, 1.0f, 0.0f}; 
 
-		Vec<T> up = forward ^ right; 
+		Vec<T> right = (up ^ dir).normalize(); 
+
+		up = dir ^ right; 
 
 		m_CTWMatrix = Mat<T>{ 
-			Vec<T>{    right.x, 	  up.x,  forward.x, T(0) }, 
-			Vec<T>{    right.y, 	  up.y,  forward.y, T(0) }, 
-			Vec<T>{    right.z, 	  up.z,  forward.z, T(0) }, 
-			Vec<T>{ m_Origin.x, m_Origin.y, m_Origin.z, T(1) } 
+			Vec<T>{ 		  right.x, 			 up.x, 			 dir.x, T(0) }, 
+			Vec<T>{ 		  right.y, 			 up.y, 			 dir.y, T(0) }, 
+			Vec<T>{ 		  right.z, 			 up.z, 			 dir.z, T(0) }, 
+			Vec<T>{ -(right*m_Origin), -(up*m_Origin), -(dir*m_Origin), T(1) } 
 		}; 
 	} 
 
@@ -116,11 +116,11 @@ public:
 			for (size_t j = 0; j < m_Height; ++j) 
 			{ 
 				T dir_x =  (T(2)*(T(i) + T(0.5))/T(m_Width) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
-				T dir_y = -(T(2)*(T(j) + T(0.5))/T(m_Height) - 1)*std::tan(m_FOV/2.)*m_AspectRatio; 
-				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1) }.normalize(); 
+				T dir_y = -(T(2)*(T(j) + T(0.5))/T(m_Height) - 1)*std::tan(m_FOV/2.); 
+				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(-1), T(0) }.normalize(); 
 				m_Rays[i*m_Height + j] = Ray<T>{ m_Origin, dir_vec }; 
 				m_Rays[i*m_Height + j].pc = {T(i), T(j), T(0), T(0)}; 
-				m_Rays[i*m_Height + j].color = {0.2f, 0.3f, 0.7f}; 
+				m_Rays[i*m_Height + j].color = { T(0.2), T(0.3), T(0.7), T(0.0) }; 
 			} 
 
 		m_HasRays = true; 
