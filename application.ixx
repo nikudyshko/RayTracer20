@@ -18,21 +18,12 @@ import render_constants;
 
 import test; 
 
-template<typename T> 
-void fill_pic(std::vector< Vec<T> >& px) 
-{ 
-	for (int j = 0; j < HEIGHT; ++j) 
-		for (int i = 0; i < WIDTH; ++i) 
-			px[j*WIDTH + i] = { i/T(WIDTH), j/T(HEIGHT), T(0), T(0) }; 
-}
-
 export int main() 
 { 
 	std::vector< Vec<float> > pics(WIDTH*HEIGHT); 
-	// for (int j = 0; j < HEIGHT; ++j) 
-	// 	for (int i = 0; i < WIDTH; ++i) 
-	// 		pics[j*WIDTH + i] = { j/float(HEIGHT), i/float(WIDTH), 0.0f, 0.0f }; 
-	fill_pic(pics); 
+	for (int j = 0; j < HEIGHT; ++j) 
+		for (int i = 0; i < WIDTH; ++i) 
+			pics[j*WIDTH + i] = { j/float(HEIGHT), i/float(WIDTH), 0.0f, 0.0f }; 
 	save_ppm(WIDTH, HEIGHT, pics); 
 
 	Vec<float> v0{ 0.5f,  0.0f, 0.0f }; 
@@ -42,7 +33,7 @@ export int main()
 	Vec<float> v4{ 0.0f,  0.0f, 0.5f }; 
 
 	Vec<float> refl{0.1f, 0.1f, 0.1f}; 
-	Vec<float> color{0.5f, 0.7f, 1.0f}; 
+	Vec<float> color{0.5f, 0.7f, 0.2f}; 
 
 	OpticalSurface<float> opt_s{0.0f, refl, color}; 
 	OpticalBulk<float> opt_b{1.0f, 1.0f}; 
@@ -75,7 +66,7 @@ export int main()
 	sh.add_surfaces(mesh); 
 	sh.calc_bound_sphere(); 
 
-	Vec<float> origin{8.0f, 8.0f, 8.0f}; 
+	Vec<float> origin{2.0f, 2.0f, 2.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
 
 	Camera<float> cam{WIDTH, HEIGHT, 3.14f/3.0f, origin, look_at}; 
