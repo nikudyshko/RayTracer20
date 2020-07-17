@@ -62,10 +62,8 @@ private:
 	// Function, that performs recurrent ray-tracing 
 	void ray_trace(std::vector< Ray<T> >& rays, std::vector< Vec<T> >& frame, RenderNode<T>* render_node) 
 	{ 
-		m_OutMut.lock(); 
 		size_t hited = 0; 
 		size_t traced = 0; 
-		m_OutMut.unlock(); 
 		for (Ray<T>& r : rays) 
 		{ 
 			if (render_node->sh.hit_sphere(r))  
@@ -120,20 +118,25 @@ public:
 		const std::vector< Ray<T> >& rays = m_Camera.get_rays(); 
 		std::vector< Vec<T> > framebuffer(rays.size()); 
 
-		size_t core_count = std::thread::hardware_concurrency(); 
+		for (size_t i = 0; i < m_Width; ++i) 
+			for (size_t j = 0; j < m_Height; ++j) 
+				framebuffer[i*m_Height + j] = rays[i*m_Height + j].dir; 
 
-		std::vector< std::vector< Ray<T> > > thread_rays(core_count); 
-		for (size_t i = 0; i < core_count; ++i) 
-			for (size_t j = 0; j < rays.size()/core_count; ++j) 
-				thread_rays[i].push_back(rays[i*rays.size()/core_count + j]); 
+		// size_t core_count = std::thread::hardware_concurrency(); 
 
-		std::vector< std::thread > threads(core_count); 
+		// std::vector< std::vector< Ray<T> > > thread_rays(core_count); 
+		// for (size_t i = 0; i < core_count; ++i) 
+		// 	for (size_t j = 0; j < rays.size()/core_count; ++j) 
+		// 		thread_rays[i].push_back(rays[i*rays.size()/core_count + j]); 
 
-		for (size_t i = 0; i < core_count; ++i) 
-			threads[i] = std::thread(&Renderer::ray_trace, this, std::ref(thread_rays[i]), std::ref(framebuffer), m_RenderingTree); 
+		// std::vector< std::thread > threads(core_count); 
+
+		// for (size_t i = 0; i < core_count; ++i) 
+		// 	ray_trace(thread_rays[i], framebuffer, m_RenderingTree); 
+		// 	threads[i] = std::thread(&Renderer::ray_trace, this, std::ref(thread_rays[i]), std::ref(framebuffer), m_RenderingTree); 
 		
-		for (std::thread& t : threads) 
-		    t.join(); 
+		// for (std::thread& t : threads) 
+		//     t.join(); 
 
 		save_ppm(m_Width, m_Height, framebuffer); 
 	} 
