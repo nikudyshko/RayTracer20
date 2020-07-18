@@ -8,6 +8,7 @@ import vec;
 import ray; 
 import mat; 
 import shell; 
+import light; 
 import camera;  
 import polygon; 
 import surface; 
