@@ -73,7 +73,7 @@ private:
 					++traced;  
 			}  
 			m_BufferMut.lock(); 
-			frame[r.pc.x*m_Height + r.pc.y] = r.color; 
+			frame[r.pc.y*m_Width + r.pc.x] = r.color; 
 			m_BufferMut.unlock(); 
 		} 
 		m_OutMut.lock(); 
@@ -118,25 +118,20 @@ public:
 		const std::vector< Ray<T> >& rays = m_Camera.get_rays(); 
 		std::vector< Vec<T> > framebuffer(rays.size()); 
 
-		for (size_t i = 0; i < m_Width; ++i) 
-			for (size_t j = 0; j < m_Height; ++j) 
-				framebuffer[i*m_Height + j] = rays[i*m_Height + j].dir; 
+		size_t core_count = std::thread::hardware_concurrency(); 
 
-		// size_t core_count = std::thread::hardware_concurrency(); 
+		std::vector< std::vector< Ray<T> > > thread_rays(core_count); 
+		for (size_t i = 0; i < core_count; ++i) 
+			for (size_t j = 0; j < rays.size()/core_count; ++j) 
+				thread_rays[i].push_back(rays[i*rays.size()/core_count + j]); 
 
-		// std::vector< std::vector< Ray<T> > > thread_rays(core_count); 
-		// for (size_t i = 0; i < core_count; ++i) 
-		// 	for (size_t j = 0; j < rays.size()/core_count; ++j) 
-		// 		thread_rays[i].push_back(rays[i*rays.size()/core_count + j]); 
+		std::vector< std::thread > threads(core_count); 
 
-		// std::vector< std::thread > threads(core_count); 
-
-		// for (size_t i = 0; i < core_count; ++i) 
-		// 	ray_trace(thread_rays[i], framebuffer, m_RenderingTree); 
-		// 	threads[i] = std::thread(&Renderer::ray_trace, this, std::ref(thread_rays[i]), std::ref(framebuffer), m_RenderingTree); 
+		for (size_t i = 0; i < core_count; ++i) 
+			threads[i] = std::thread(&Renderer::ray_trace, this, std::ref(thread_rays[i]), std::ref(framebuffer), m_RenderingTree); 
 		
-		// for (std::thread& t : threads) 
-		//     t.join(); 
+		for (std::thread& t : threads) 
+		    t.join(); 
 
 		save_ppm(m_Width, m_Height, framebuffer); 
 	} 
