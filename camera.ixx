@@ -112,16 +112,16 @@ public:
 
 		m_Rays.resize(m_Width*m_Height); 
 
-		for (size_t i = 0; i < m_Width; ++i) 
+		for (size_t j = 0; j < m_Width; ++j) 
 		{ 
-			T dir_x = ((2*i + 1)/T(m_Width) - T(1))*std::tan(m_FOV/T(2.0))*m_AspectRatio; 
-			for (size_t j = 0; j < m_Height; ++j) 
+			T dir_x = ((2*j + 1)/T(m_Width) - T(1))*std::tan(m_FOV/T(2.0))*m_AspectRatio; 
+			for (size_t i = 0; i < m_Height; ++i) 
 			{ 
-				T dir_y = -((2*j + 1)/T(m_Height) - T(1))*std::tan(m_FOV/T(2.0)); 
-				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1), T(0) }.normalize();  
-				m_Rays[i*m_Height + j] = Ray<T>{ m_Origin, dir_vec }; 
-				m_Rays[i*m_Height + j].pc = {T(i), T(j), T(0), T(0)}; 
-				m_Rays[i*m_Height + j].color = { T(0.2), T(0.3), T(0.7), T(0.0) }; 
+				T dir_y = -((2*i + 1)/T(m_Height) - T(1))*std::tan(m_FOV/T(2.0)); 
+				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1), T(0) }.normalize(); 
+				m_Rays[i*m_Width + j] = Ray<T>{ m_Origin, dir_vec }; 
+				m_Rays[i*m_Width + j].pc = {T(j), T(i), T(0), T(0)}; 
+				m_Rays[i*m_Width + j].color = { T(0.2), T(0.3), T(0.7), T(0.0) }; 
 			} 
 		} 
 
