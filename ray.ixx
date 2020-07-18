@@ -17,7 +17,7 @@ struct Ray
 	Vec<T> origin{}, dir{}; 
 
 	// Pixel coordinates for Camera ray 
-	Vec<T> pc{};  
+	Vec<T> pc{}; 
 
 	// Default constructor 
 	inline 
