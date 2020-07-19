@@ -8,6 +8,7 @@ import std.core;
 
 import vec; 
 import ray; 
+import light; 
 import shell; 
 import camera; 
 
@@ -24,6 +25,8 @@ export template<typename T>
 class Renderer 
 { 
 private: 
+	// Flag to show if the Renderer has Lights 
+	bool m_HasLights{false}; 
 	// Flag to show if the Renderer has a Camera 
 	bool m_HasCamera{false}; 
 	// Flag to show if the Renderer has a scene 
@@ -32,6 +35,8 @@ private:
 	bool m_HasRenderingTree{false}; 
 	// Camera resolution 
 	size_t m_Width{}, m_Height{}; 
+	// Lights 
+	std::vector< Light<T> > lights{}; 
 	// Camera 
 	Camera<T> m_Camera{}; 
 	// Shell, that contains other shells and represents a scene 
@@ -70,11 +75,25 @@ private:
 			{ 
 				++hited; 
 				if (render_node->sh.trace(r)) 
-					++traced;  
+				{ 
+					++traced; 
+
+					T diffuse_light{}; 
+
+					auto hit_spot = r.hit_spots.begin()->second; 
+
+					for (Light<T>& l : lights) 
+					{ 
+						Vec<T> light_dir = (l.position - std::get<1>(hit_spot)).normalize();
+						diffuse_light += l.intensity*std::max(T(0), light_dir*std::get<2>(hit_spot)); 
+					} 
+					Vec<T> s_color = std::get<3>(hit_spot); 
+					Vec<T> c{ diffuse_light*s_color.r, diffuse_light*s_color.g, diffuse_light*s_color.b}; 
+					m_BufferMut.lock();  
+					frame[r.pc.y*m_Width + r.pc.y] = c; 
+					m_BufferMut.unlock(); 
+				}
 			}  
-			m_BufferMut.lock(); 
-			frame[r.pc.y*m_Width + r.pc.x] = r.color; 
-			m_BufferMut.unlock(); 
 		} 
 		m_OutMut.lock(); 
 		std::cout << "Hited: " << hited << '\n'; 
@@ -85,6 +104,15 @@ private:
 public: 
 	// Default constructor 
 	Renderer() {} 
+
+	// Adds a light-source 
+	void add_light(const Light<T>& light) 
+	{ 
+		lights.push_back(light); 
+		m_HasLights = true; 
+		// for (Light<T>& l : lights) 
+		// 	std::cout << l.position << '\n'; 
+	} 
 
 	// Sets the Camera 
 	void set_camera(const Camera<T>& camera) 
@@ -114,7 +142,7 @@ public:
 	// Function, that performs a rendering 
 	void render() 
 	{ 
-		assert(m_HasCamera && m_HasScene && m_HasRenderingTree); 
+		assert(m_HasLights && m_HasCamera && m_HasScene && m_HasRenderingTree); 
 		const std::vector< Ray<T> >& rays = m_Camera.get_rays(); 
 		std::vector< Vec<T> > framebuffer(rays.size()); 
 
