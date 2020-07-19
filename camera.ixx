@@ -121,7 +121,6 @@ public:
 				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1), T(0) }.normalize(); 
 				m_Rays[i*m_Width + j] = Ray<T>{ m_Origin, dir_vec }; 
 				m_Rays[i*m_Width + j].pc = {T(j), T(i), T(0), T(0)}; 
-				m_Rays[i*m_Width + j].color = { T(0.2), T(0.3), T(0.7), T(0.0) }; 
 			} 
 		} 
 
