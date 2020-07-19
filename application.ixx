@@ -75,6 +75,18 @@ export int main()
 	cam.calc_rays(); 
 
 	Renderer<float> rend{}; 
+
+	Vec<float> p{3.0f, 3.0f, 3.0f}; 
+	Vec<float> c{1.0f, 1.0f, 1.0f}; 
+
+	Light<float> l1{1.0f, c, p}; 
+	Light<float> l2{0.5f, Vec<float>{7.0f, -3.0f, 4.0f}, Vec<float>{0.3f, 0.5f, 0.4f}}; 
+	Light<float> l3{0.3f, Vec<float>{-7.0f, 3.0f, 4.0f}, Vec<float>{0.1f, 0.1f, 0.2f}}; 
+	std::cout << l1.position << '\n' << p << '\n';  
+	rend.add_light(l1); 
+	std::cout << l1.position << '\n' << p << '\n'; 
+	rend.add_light(l2); 
+	rend.add_light(l3); 
 	rend.set_camera(cam); 
 	rend.set_scene(sh); 
 	rend.build_rendering_tree(); 
