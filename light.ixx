@@ -26,5 +26,5 @@ struct Light
           const Vec<T>& position_) : 
         intensity{intensity_}, 
         color{color_}, 
-        position{position} {} 
+        position{position_} {} 
 }; 
