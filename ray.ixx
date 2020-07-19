@@ -2,6 +2,8 @@ module;
 
 export module ray; 
 
+import std.core; 
+
 import vec; 
 
 // Ray structure 
@@ -10,14 +12,16 @@ struct Ray
 { 
 	// Intensity of the light 
 	T intensity{}; 
-	// Color of the light 
-	Vec<T> color{};  
 	// origin - origin of the ray 
 	// dir - direction of ray 
 	Vec<T> origin{}, dir{}; 
 
 	// Pixel coordinates for Camera ray 
 	Vec<T> pc{}; 
+
+	// Hit spots map, contains distance (key), local coordinates, global coordinates and color  
+	// Automatically sorts via keys (distance) 
+	std::map< T, std::tuple<Vec<T>, Vec<T>, Vec<T>, Vec<T>> > hit_spots{}; 
 
 	// Default constructor 
 	inline 
