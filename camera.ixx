@@ -91,7 +91,10 @@ public:
 	{ 
 		Vec<T> dir = (m_Origin - m_LookAt).normalize(); 
 
-		Vec<T> up = {0.0f, 1.0f, 0.0f}; 
+		// Vec<T> up = {0.0f, 1.0f, 0.0f}; 
+		Vec<T> up = m_Origin; 
+		up.z = T(0); 
+		up -= m_Origin; 
 
 		Vec<T> right = (up ^ dir).normalize(); 
 
@@ -99,9 +102,9 @@ public:
 
 		m_CTWMatrix = Mat<T>{ 
 			Vec<T>{ right.x, up.x, dir.x, -(right*m_Origin) }, 
-			Vec<T>{ right.y, up.y, dir.y,    -(up*m_Origin) }, 
+			Vec<T>{	right.y, up.y, dir.y,    -(up*m_Origin) }, 
 			Vec<T>{ right.z, up.z, dir.z,   -(dir*m_Origin) }, 
-			Vec<T>{    T(0), T(0),  T(0), 			   T(1) } 
+			Vec<T>{	   T(0), T(0),	T(0),			   T(1) } 
 		}; 
 	} 
 
