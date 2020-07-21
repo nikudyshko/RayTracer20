@@ -91,10 +91,7 @@ public:
 	{ 
 		Vec<T> dir = (m_Origin - m_LookAt).normalize(); 
 
-		// Vec<T> up = {0.0f, 1.0f, 0.0f}; 
-		Vec<T> up = m_Origin; 
-		up.z = T(0); 
-		up -= m_Origin; 
+		Vec<T> up = {0.0f, 0.0f, -1.0f}; 
 
 		Vec<T> right = (up ^ dir).normalize(); 
 
