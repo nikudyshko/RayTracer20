@@ -18,7 +18,7 @@ struct Ray
 
 	// Pixel coordinates for Camera ray 
 	Vec<T> pc{}; 
-
+	
 	// Hit spots map, contains distance (key), local coordinates, global coordinates and color  
 	// Automatically sorts via keys (distance) 
 	std::map< T, std::tuple<Vec<T>, Vec<T>, Vec<T>, Vec<T>> > hit_spots{}; 
