@@ -145,14 +145,15 @@ public:
 	bool trace(Ray<T>& r) 
 	{ 
 		assert(m_HasMesh); 
-		T dist{}; 
-		Vec<T> lx_point{}, gx_point{}; 
-		for (const Surface<T>& s : m_Mesh) 
-			if (s.get_polygon().ray_intersect(r, dist, lx_point, gx_point)) 
+		bool hitted{false}; 
+		T dist{T(0)}; 
+		Vec<T> lx_point{}, gx_point{};  
+		for (size_t i = 0; i < m_Mesh.size(); ++i)
+			if (m_Mesh[i].get_polygon().ray_intersect(r, dist, lx_point, gx_point)) 
 			{ 
-				r.hit_spots[dist] = std::make_tuple(lx_point, gx_point, s.get_polygon().get_normal(), s.get_color(lx_point)); 
-				return true; 
+				hitted = true;  
+				r.hit_spots[-dist] = std::make_tuple(i, lx_point, gx_point, m_Mesh[i].get_polygon().get_normal(), m_Mesh[i].get_color(lx_point)); 
 			} 
-		return false; 
+		return hitted;  
 	}
 }; 
