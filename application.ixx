@@ -39,12 +39,12 @@ export int main()
 	OpticalSurface<float> opt_s{0.0f, refl, color}; 
 	OpticalBulk<float> opt_b{1.0f, 1.0f}; 
 
-	Polygon<float> p0{v0, v1, v4}; 
-	Polygon<float> p1{v1, v2, v4}; 
-	Polygon<float> p2{v2, v3, v4}; 
-	Polygon<float> p3{v3, v0, v4}; 
-	Polygon<float> p4{v0, v2, v1}; 
-	Polygon<float> p5{v0, v3, v2}; 
+	Polygon<float> p0{v0, v4, v1}; 
+	Polygon<float> p1{v1, v4, v2}; 
+	Polygon<float> p2{v2, v4, v3}; 
+	Polygon<float> p3{v3, v4, v0}; 
+	Polygon<float> p4{v0, v1, v2}; 
+	Polygon<float> p5{v0, v2, v3}; 
 	p0.calc_normal(); 
 	p1.calc_normal(); 
 	p2.calc_normal(); 
@@ -67,7 +67,7 @@ export int main()
 	sh.add_surfaces(mesh); 
 	sh.calc_bound_sphere(); 
 
-	Vec<float> origin{2.0f, 2.0f, 2.0f}; 
+	Vec<float> origin{3.0f, 3.0f, 3.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
 
 	Camera<float> cam{WIDTH, HEIGHT, 3.14f/3.0f, origin, look_at}; 
@@ -76,17 +76,12 @@ export int main()
 
 	Renderer<float> rend{}; 
 
-	Vec<float> p{3.0f, 3.0f, 3.0f}; 
-	Vec<float> c{1.0f, 1.0f, 1.0f}; 
-
-	Light<float> l1{1.0f, c, p}; 
-	Light<float> l2{0.5f, Vec<float>{7.0f, -3.0f, 4.0f}, Vec<float>{0.3f, 0.5f, 0.4f}}; 
-	Light<float> l3{0.3f, Vec<float>{-7.0f, 3.0f, 4.0f}, Vec<float>{0.1f, 0.1f, 0.2f}}; 
-	std::cout << l1.position << '\n' << p << '\n';  
-	rend.add_light(l1); 
-	std::cout << l1.position << '\n' << p << '\n'; 
-	rend.add_light(l2); 
-	rend.add_light(l3); 
+	Light<float> l1{1.0f, Vec<float>{1.0f, 1.0f, 1.0f}, Vec<float>{3.0f, 3.0f, 3.0f}}; 
+	// Light<float> l2{0.5f, Vec<float>{0.3f, 0.5f, 0.4f}, Vec<float>{-3.0f, -3.0f, 3.0f}}; 
+	// Light<float> l3{0.3f, Vec<float>{0.1f, 0.1f, 0.2f}, Vec<float>{-7.0f, 3.0f, 4.0f}}; 
+	rend.add_light(l1);  
+	// rend.add_light(l2); 
+	// rend.add_light(l3); 
 	rend.set_camera(cam); 
 	rend.set_scene(sh); 
 	rend.build_rendering_tree(); 
