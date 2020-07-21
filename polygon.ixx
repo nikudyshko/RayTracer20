@@ -85,9 +85,9 @@ public:
 
 				lx_point.t = inv_det * m_V2 * q_v; 
 
-				gx_point = lx_point.u*m_A + lx_point.v*m_B + lx_point.t*m_C; 
+				gx_point = lx_point.u*m_A + lx_point.v*m_B + (T(1) - lx_point.u - lx_point.v)*m_C; 
 
-				dist = (ray.origin - gx_point).length(); 
+				dist = lx_point.t; 
 
 				return true; 
 			} 
