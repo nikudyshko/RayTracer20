@@ -218,13 +218,13 @@ Vec<T> operator- (const Vec<T>& v)
 export template<typename T> 
 requires sim_arithm<T> 
 inline 
-Vec<T>& operator- (Vec<T>&& v) 
+Vec<T>&& operator- (Vec<T>&& v) 
 { 
 	v.x = -v.x; 
 	v.y = -v.y; 
 	v.z = -v.z; 
 	v.w = -v.w; 
-	return v; 
+	return std::move(v); 
 } 
 
 // Scalar-Vector multiplication 
@@ -264,13 +264,13 @@ auto operator* (const Vec<T>& lhs, U rhs) -> Vec<decltype(lhs.x*rhs)>
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<T> 
 inline 
-auto operator* (Vec<T>&& lhs, U rhs) -> Vec<T>& 
+auto operator* (Vec<T>&& lhs, U rhs) -> Vec<T>&& 
 { 
 	lhs.x *= T(rhs); 
 	lhs.y *= T(rhs); 
 	lhs.z *= T(rhs); 
 	lhs.w *= T(rhs); 
-	return lhs; 
+	return std::move(lhs); 
 } 
 
 // Vector-Vector dot-product 
@@ -329,33 +329,33 @@ auto operator^ (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x*rhs.
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator^ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>& 
+auto operator^ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>&& 
 { 
 	rhs = { U(lhs.y)*rhs.z - U(lhs.z)*rhs.y, 
 			U(lhs.z)*rhs.x - U(lhs.x)*rhs.z, 
 			U(lhs.x)*rhs.y - U(lhs.y)*rhs.x, 
 			U()	}; 
-	return rhs; 
+	return std::move(rhs); 
 } 
 
 // Vector-Vector cross-product with rvalue 
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<T> 
 inline 
-auto operator^ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>& 
+auto operator^ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>&& 
 { 
 	lhs = { lhs.y*T(rhs.z) - lhs.z*T(rhs.y), 
 			lhs.z*T(rhs.x) - lhs.x*T(rhs.z), 
 			lhs.x*T(rhs.y) - lhs.y*T(rhs.x), 
 			T() }; 
-	return lhs; 
+	return std::move(lhs); 
 } 
 
 // Vector-Vector cross-product with rvalues 
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<T> && sim_arithm<U> 
 inline 
-auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)> 
+auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)>&&
 { 
 	using W = decltype(lhs.x*rhs.y); 
 	if constexpr(std::is_same<W, T>) 
@@ -364,7 +364,7 @@ auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)>
 				lhs.z*T(rhs.x) - lhs.x*T(rhs.z), 
 				lhs.x*T(rhs.y) - lhs.y*T(rhs.x), 
 				T() }; 
-		return lhs; 
+		return std::move(lhs); 
 	} 
 	else 
 	{ 
@@ -372,7 +372,7 @@ auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)>
 				U(lhs.z)*rhs.z - U(lhs.x)*rhs.z, 
 				U(lhs.x)*rhs.y - U(lhs.y)*rhs.x, 
 				U() }; 
-		return rhs; 
+		return std::move(rhs); 
 	} 
 } 
 
@@ -392,33 +392,33 @@ auto operator+ (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x + rh
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator+ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>& 
+auto operator+ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>&& 
 { 
 	rhs.x += U(lhs.x); 
 	rhs.y += U(lhs.y); 
 	rhs.z += U(lhs.z); 
 	rhs.w += U(lhs.w); 
-	return rhs; 
+	return std::move(rhs); 
 } 
 
 // Vector-Vector addition with rvalue 
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator+ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>& 
+auto operator+ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>&& 
 { 
 	lhs.x += T(rhs.x); 
 	lhs.y += T(rhs.y); 
 	lhs.z += T(rhs.z); 
 	lhs.w += T(rhs.w); 
-	return lhs; 
+	return std::move(lhs); 
 } 
 
 // Vector-Vector addition with rvalues 
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<T> && sim_arithm<U> 
 inline 
-auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>& 
+auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>&& 
 { 
 	using W = decltype(lhs.x + rhs.x); 
 	if constexpr(std::is_same<T, W>::value) 
@@ -427,7 +427,7 @@ auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>&
 		lhs.y += T(rhs.y); 
 		lhs.z += T(rhs.z); 
 		lhs.w += T(rhs.w); 
-		return lhs; 
+		return std::move(lhs); 
 	} 
 	else 
 	{ 
@@ -435,7 +435,7 @@ auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>&
 		rhs.y += U(lhs.y); 
 		rhs.z += U(lhs.z); 
 		rhs.w += U(lhs.w); 
-		return rhs; 
+		return std::move(rhs); 
 	} 
 } 
 
@@ -455,33 +455,33 @@ auto operator- (const Vec<T>& lhs, const Vec<U>& rhs) -> Vec<decltype(lhs.x - rh
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<U> 
 inline 
-auto operator- (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>& 
+auto operator- (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>&& 
 { 
 	rhs.x -= U(lhs.x); 
 	rhs.y -= U(lhs.y); 
 	rhs.z -= U(lhs.z); 
 	rhs.w -= U(lhs.w); 
-	return -rhs; 
+	return std::move(-rhs); 
 } 
 
 // Vector-Vector substraction with rvalue 
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<T> 
 inline 
-auto operator- (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>& 
+auto operator- (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>&& 
 { 
 	lhs.x -= T(rhs.x); 
 	lhs.y -= T(rhs.y); 
 	lhs.z -= T(rhs.z); 
 	lhs.w -= T(rhs.w); 
-	return lhs; 
+	return std::move(lhs); 
 } 
 
 // Vector-Vector substraction with rvalues 
 export template<typename T, typename U> 
 requires castable<T, U> && sim_arithm<T> && sim_arithm<U> 
 inline 
-auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)> 
+auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)>&& 
 { 
 	using W = decltype(lhs.x - rhs.x); 
 	if constexpr(std::is_same<W, T>) 
@@ -490,7 +490,7 @@ auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)>
 		lhs.y -= T(rhs.y); 
 		lhs.z -= T(rhs.z); 
 		lhs.w -= T(rhs.w); 
-		return lhs; 
+		return std::move(lhs); 
 	} 
 	else 
 	{ 
@@ -498,7 +498,7 @@ auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)>
 		rhs.y -= U(lhs.y); 
 		rhs.z -= U(lhs.z); 
 		rhs.w -= U(lhs.w); 
-		return -rhs; 
+		return std::move(-rhs); 
 	} 
 } 
 
