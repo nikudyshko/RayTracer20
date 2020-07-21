@@ -81,15 +81,14 @@ private:
 					T diffuse_light{T(0)}; 
 
 					auto hit_spot = r.hit_spots.begin()->second; 
-					Vec<T> light_dir{};  
 
 					for (Light<T>& l : lights) 
 					{ 
-						light_dir = (l.position - std::get<1>(hit_spot)).normalize();
-						diffuse_light += l.intensity*std::max(T(0), light_dir*std::get<2>(hit_spot)); 
+						Vec<T> light_dir = (l.position - std::get<2>(hit_spot)).normalize();
+						diffuse_light += l.intensity*std::max(T(0), light_dir*std::get<3>(hit_spot)); 
 					} 
-					Vec<T> s_color = diffuse_light*std::get<3>(hit_spot); 
-					m_BufferMut.lock();  
+					Vec<T> s_color = diffuse_light*std::get<4>(hit_spot); 
+					m_BufferMut.lock();
 					frame[r.pc.y*m_Width + r.pc.x] = s_color;  
 					m_BufferMut.unlock(); 
 				}
@@ -110,8 +109,6 @@ public:
 	{ 
 		lights.push_back(light); 
 		m_HasLights = true; 
-		// for (Light<T>& l : lights) 
-		// 	std::cout << l.position << '\n'; 
 	} 
 
 	// Sets the Camera 
