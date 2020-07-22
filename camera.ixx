@@ -87,23 +87,19 @@ public:
 	} 
 
 	// Function to calculate camera-to-world matrix 
-	void calc_matrix() 
+	void calc_matrix(const Vec<T>& temp = {0.0f, 1.0f, 0.0f}) 
 	{ 
 		Vec<T> dir = (m_Origin - m_LookAt).normalize(); 
-
-		Vec<T> up = {0.0f, 0.0f, -1.0f}; 
-
-		Vec<T> right = (up ^ dir).normalize(); 
-
-		up = dir ^ right; 
+		Vec<T> right = (temp ^ dir).normalize(); 
+		Vec<T> up = dir ^ right; 
 
 		m_CTWMatrix = Mat<T>{ 
 			Vec<T>{ right.x, up.x, dir.x, -(right*m_Origin) }, 
-			Vec<T>{	right.y, up.y, dir.y,    -(up*m_Origin) }, 
-			Vec<T>{ right.z, up.z, dir.z,   -(dir*m_Origin) }, 
-			Vec<T>{	   T(0), T(0),	T(0),			   T(1) } 
+			Vec<T>{ right.y, up.y, dir.y, 	 -(up*m_Origin) }, 
+			Vec<T>{ right.z, up.z, dir.z, 	-(dir*m_Origin) }, 
+			Vec<T>{    T(0), T(0), 	T(0), 			   T(1) }
 		}; 
-	} 
+	}
 
 	// Function to calculate Rays 
 	void calc_rays() 
