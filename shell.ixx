@@ -71,6 +71,9 @@ public:
 		std::copy(mesh.begin(), mesh.end(), std::back_inserter(m_Mesh)); 
 		m_HasMesh = true; 
 	} 
+	// Function to add inner Shells 
+	void add_inner_shell(const Shell<T>& sh) 
+	{ m_InnerShells.push_back(sh); } 
 
 	// Returns a vector of inner Shells 
 	const std::vector< Shell<T> >& get_inner_shells() const 
