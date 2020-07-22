@@ -71,6 +71,7 @@ private:
 		size_t traced = 0; 
 		for (Ray<T>& r : rays) 
 		{ 
+			Vec<T> color{ 0.2f, 0.3f, 0.7f }; 
 			if (render_node->sh.hit_sphere(r))  
 			{ 
 				++hited; 
@@ -87,12 +88,12 @@ private:
 						Vec<T> light_dir = (l.position - std::get<2>(hit_spot)).normalize();
 						diffuse_light += l.intensity*std::max(T(0), light_dir*std::get<3>(hit_spot)); 
 					} 
-					Vec<T> s_color = diffuse_light*std::get<4>(hit_spot); 
-					m_BufferMut.lock();
-					frame[r.pc.y*m_Width + r.pc.x] = s_color;  
-					m_BufferMut.unlock(); 
+					color = diffuse_light*std::get<4>(hit_spot); 
 				}
-			}  
+			} 
+			m_BufferMut.lock(); 
+			frame[r.pc.y*m_Width + r.pc.x] = color; 
+			m_BufferMut.unlock(); 
 		} 
 		m_OutMut.lock(); 
 		std::cout << "Hited: " << hited << '\n'; 
