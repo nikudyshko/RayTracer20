@@ -27,11 +27,20 @@ export int main()
 			pics[j*WIDTH + i] = { j/float(HEIGHT), i/float(WIDTH), 0.0f, 0.0f }; 
 	save_ppm(WIDTH, HEIGHT, pics); 
 
-	Vec<float> v0{ 0.5f,  0.0f, 0.0f }; 
-	Vec<float> v1{ 0.0f, -0.5f, 0.0f }; 
-	Vec<float> v2{-0.5f,  0.0f, 0.0f }; 
-	Vec<float> v3{ 0.0f,  0.5f, 0.0f }; 
-	Vec<float> v4{ 0.0f,  0.0f, 0.5f }; 
+	Vec<float> m_v0{  0.5f,  0.0f, 0.0f }; 
+	Vec<float> m_v1{  0.0f, -0.5f, 0.0f }; 
+	Vec<float> m_v2{ -0.5f,  0.0f, 0.0f }; 
+	Vec<float> m_v3{  0.0f,  0.5f, 0.0f }; 
+	Vec<float> m_v4{  0.0f,  0.0f, 0.5f }; 
+	Vec<float> p_v0{  0.0f,  0.0f, 0.0f }; 
+	Vec<float> p_v1{ -2.0f,  0.0f, 0.0f }; 
+	Vec<float> p_v2{  2.0f,  0.0f, 0.0f }; 
+	Vec<float> p_v3{  0.0f, -2.0f, 0.0f }; 
+	Vec<float> p_v4{  0.0f,  2.0f, 0.0f }; 
+	Vec<float> p_v5{ -2.0f, -2.0f, 0.0f }; 
+	Vec<float> p_v6{ -2.0f,  2.0f, 0.0f }; 
+	Vec<float> p_v7{  2.0f, -2.0f, 0.0f }; 
+	Vec<float> p_v8{  2.0f,  2.0f, 0.0f }; 
 
 	Vec<float> refl{0.1f, 0.1f, 0.1f}; 
 	Vec<float> color0{1.0f, 0.0f, 0.0f}; 
@@ -49,38 +58,73 @@ export int main()
 	OpticalSurface<float> opt_s5{0.0f, refl, color5}; 
 	OpticalBulk<float> opt_b{1.0f, 1.0f};  
 
-	Polygon<float> p0{v0, v4, v1}; 
-	Polygon<float> p1{v1, v4, v2}; 
-	Polygon<float> p2{v2, v4, v3}; 
-	Polygon<float> p3{v3, v4, v0}; 
-	Polygon<float> p4{v0, v1, v2}; 
-	Polygon<float> p5{v0, v2, v3}; 
-	p0.calc_normal(); 
-	p1.calc_normal(); 
-	p2.calc_normal(); 
-	p3.calc_normal(); 
-	p4.calc_normal(); 
-	p5.calc_normal(); 
+	Polygon<float> m_p0{m_v0, m_v4, m_v1}; 
+	Polygon<float> m_p1{m_v1, m_v4, m_v2}; 
+	Polygon<float> m_p2{m_v2, m_v4, m_v3}; 
+	Polygon<float> m_p3{m_v3, m_v4, m_v0}; 
+	Polygon<float> m_p4{m_v0, m_v1, m_v2}; 
+	Polygon<float> m_p5{m_v0, m_v2, m_v3}; 
+	Polygon<float> p_p0{p_v0, p_v1, p_v3}; 
+	Polygon<float> p_p1{p_v0, p_v4, p_v1}; 
+	Polygon<float> p_p2{p_v2, p_v4, p_v0}; 
+	Polygon<float> p_p3{p_v0, p_v3, p_v2}; 
+	Polygon<float> p_p4{p_v1, p_v5, p_v3}; 
+	Polygon<float> p_p5{p_v1, p_v4, p_v6}; 
+	Polygon<float> p_p6{p_v2, p_v8, p_v4}; 
+	Polygon<float> p_p7{p_v2, p_v3, p_v7}; 
+	m_p0.calc_normal(); 
+	m_p1.calc_normal(); 
+	m_p2.calc_normal(); 
+	m_p3.calc_normal(); 
+	m_p4.calc_normal(); 
+	m_p5.calc_normal(); 
+	p_p0.calc_normal(); 
+	p_p1.calc_normal(); 
+	p_p2.calc_normal(); 
+	p_p3.calc_normal(); 
+	p_p4.calc_normal(); 
+	p_p5.calc_normal(); 
+	p_p6.calc_normal(); 
+	p_p7.calc_normal(); 
 
-	Surface<float> s0{p0, opt_s0}; 
-	Surface<float> s1{p1, opt_s1}; 
-	Surface<float> s2{p2, opt_s2}; 
-	Surface<float> s3{p3, opt_s3}; 
-	Surface<float> s4{p4, opt_s4}; 
-	Surface<float> s5{p5, opt_s5}; 
+	Surface<float> m_s0{m_p0, opt_s0}; 
+	Surface<float> m_s1{m_p1, opt_s1}; 
+	Surface<float> m_s2{m_p2, opt_s2}; 
+	Surface<float> m_s3{m_p3, opt_s3}; 
+	Surface<float> m_s4{m_p4, opt_s4}; 
+	Surface<float> m_s5{m_p5, opt_s5}; 
+	Surface<float> p_s0{p_p0, opt_s3}; 
+	Surface<float> p_s1{p_p1, opt_s2}; 
+	Surface<float> p_s2{p_p2, opt_s1}; 
+	Surface<float> p_s3{p_p3, opt_s0}; 
+	Surface<float> p_s4{p_p4, opt_s3}; 
+	Surface<float> p_s5{p_p5, opt_s2}; 
+	Surface<float> p_s6{p_p6, opt_s1}; 
+	Surface<float> p_s7{p_p7, opt_s0}; 
 
-	std::vector< Surface<float> > mesh{s0, s1, s2, s3, s4, s5}; 
+	// std::vector< Surface<float> > mesh{m_s0, m_s1, m_s2, m_s3, m_s4, m_s5}; 
+	// std::vector< Surface<float> > plane{p_s0, p_s1, p_s2, p_s3, p_s4, p_s5, p_s6, p_s7}; 
 
-	Shell<float> sh{}; 
-	sh.set_opt_prop(opt_b); 
-	sh.add_surfaces(mesh); 
-	sh.calc_bound_sphere(); 
+	// Shell<float> m_sh{}; 
+	// m_sh.set_opt_prop(opt_b); 
+	// m_sh.add_surfaces(mesh); 
+	// m_sh.calc_bound_sphere(); 
+	// Shell<float> p_sh{}; 
+	// p_sh.add_surfaces(plane); 
+	// p_sh.add_inner_shell(m_sh); 
+	// p_sh.calc_bound_sphere(); 
 
-	Vec<float> origin{2.0f, 2.0f, 2.0f}; 
+	std::vector< Surface<float> > mesh{m_s0, m_s1, m_s2, m_s3, m_s4, m_s5, p_s0, p_s1, p_s2, p_s3, p_s4, p_s5, p_s6, p_s7}; 
+	Shell<float> p_sh{}; 
+	p_sh.set_opt_prop(opt_b); 
+	p_sh.add_surfaces(mesh); 
+	p_sh.calc_bound_sphere(); 
+
+	Vec<float> origin{3.0f, 3.0f, 3.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
 
 	Camera<float> cam{WIDTH, HEIGHT, 3.14f/3.0f, origin, look_at}; 
-	cam.calc_matrix(); 
+	cam.calc_matrix({0.0f, 0.0f, -1.0f}); 
 	cam.calc_rays(); 
 
 	Renderer<float> rend{}; 
@@ -92,9 +136,20 @@ export int main()
 	rend.add_light(l2); 
 	rend.add_light(l3); 
 	rend.set_camera(cam); 
-	rend.set_scene(sh); 
+	rend.set_scene(p_sh); 
 	rend.build_rendering_tree(); 
 	rend.render(); 
+
+	Mat<float> m = Mat<float>{ 
+		Vec<float>{ 1.0f,  2.0f,  3.0f,  4.0f}, 
+		Vec<float>{ 5.0f,  6.0f,  7.0f,  8.0f}, 
+		Vec<float>{ 9.0f, 10.0f, 11.0f, 12.0f}, 
+		Vec<float>{13.0f, 14.0f, 15.0f, 16.0f} 
+	}; 
+
+	Vec<float> v = { 17.0f, 18.0f, 19.0f, 20.0f }; 
+	Vec<float> r = m*v; 
+	std::cout << r << '\n'; 
 
 	return 0; 
 } 
