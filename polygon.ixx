@@ -85,7 +85,7 @@ public:
 
 				lx_point.t = inv_det * m_V2 * q_v; 
 
-				gx_point = lx_point.u*m_A + lx_point.v*m_B + (T(1) - lx_point.u - lx_point.v)*m_C; 
+				gx_point = ray.origin + lx_point.t*ray.dir; 
 
 				dist = lx_point.t; 
 
