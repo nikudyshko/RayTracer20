@@ -18,6 +18,9 @@ struct Ray
 
 	// Pixel coordinates for Camera ray 
 	Vec<T> pc{}; 
+
+	// Color of the pixel 
+	Vec<T> color{}; 
 	
 	// Hit spots map, contains distance (key), local coordinates, global coordinates and color  
 	// Automatically sorts via keys (distance) 
