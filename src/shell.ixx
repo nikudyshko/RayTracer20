@@ -8,6 +8,7 @@ import std.core;
 
 import vec; 
 import ray; 
+import light; 
 import material; 
 import surface; 
 
@@ -145,18 +146,45 @@ public:
 	} 
 
 	// Traces the Ray 
-	bool trace(Ray<T>& r) 
+	bool trace(Ray<T>& r, const std::vector< Light<T> >& lights) 
 	{ 
 		assert(m_HasMesh); 
 		bool hitted{false}; 
-		T dist{T(0)}; 
-		Vec<T> lx_point{}, gx_point{};  
+		size_t idx{0}; 
+		T dist{T(0)}, max_dist{std::numeric_limits<T>::max()}; 
+		Vec<T> lx_temp{}, gx_temp{}; 
+		Vec<T> lx_point{}, gx_point{}; 
+		Vec<T> norm{}; 
 		for (size_t i = 0; i < m_Mesh.size(); ++i)
-			if (m_Mesh[i].get_polygon().ray_intersect(r, dist, lx_point, gx_point)) 
+			if (m_Mesh[i].get_polygon().ray_intersect(r, dist, lx_temp, gx_temp)) 
 			{ 
-				hitted = true;  
-				r.hit_spots[-dist] = std::make_tuple(i, lx_point, gx_point, m_Mesh[i].get_polygon().get_normal(), m_Mesh[i].get_color(lx_point)); 
+				hitted = true; 
+				if (dist < max_dist) 
+				{ 
+					max_dist = dist; 
+					idx = i; 
+					lx_point = lx_temp; 
+					gx_point = gx_temp; 
+					norm = m_Mesh[i].get_polygon().get_normal(); 
+				} 
 			} 
+		if (hitted) 
+		{ 
+			T diffuse_light{T(0)}; 
+			T specular_light{T(0)}; 
+
+			OpticalSurface<T> s = m_Mesh[idx].get_surf_opt(lx_point); 
+
+			for (const Light<T>& l : lights) 
+			{ 
+				Vec<T> light_dir = (l.position - gx_point).normalize(); 
+				T light_norm = light_dir*norm; 
+				Vec<T> reflect = light_dir - T(2)*light_norm*norm; 
+				diffuse_light += l.intensity*std::max(T(0), light_norm); 
+				specular_light += l.intensity*std::pow(std::max(T(0), -reflect*r.dir), s.specular); 
+			} 
+			r.color = diffuse_light*s.reflection[0]*s.color + specular_light*s.reflection[1]*Vec<T>{T(1), T(1), T(1)}; 
+		}
 		return hitted;  
 	}
 }; 
