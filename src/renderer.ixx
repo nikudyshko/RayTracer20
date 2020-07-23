@@ -44,7 +44,7 @@ private:
 	// Rendering tree 
 	RenderNode<T>* m_RenderingTree{nullptr}; 
 
-	std::mutex m_BufferMut, m_OutMut; 
+	std::mutex m_BufferMut, m_OutMut;  
 
 	// Function, that performs a recurrent build of rendering tree 
 	RenderNode<T>* add_render_nodes(RenderNode<T>* parent_node, const Shell<T>& sh) 
@@ -71,28 +71,15 @@ private:
 		size_t traced = 0; 
 		for (Ray<T>& r : rays) 
 		{ 
-			Vec<T> color{ 0.2f, 0.3f, 0.7f }; 
+			r.color = {T(0.2), T(0.3), T(0.7)}; 
 			if (render_node->sh.hit_sphere(r))  
 			{ 
 				++hited; 
-				if (render_node->sh.trace(r)) 
-				{ 
+				if (render_node->sh.trace(r, lights)) 
 					++traced; 
-
-					T diffuse_light{T(0)}; 
-
-					auto hit_spot = r.hit_spots.begin()->second; 
-
-					for (Light<T>& l : lights) 
-					{ 
-						Vec<T> light_dir = (l.position - std::get<2>(hit_spot)).normalize();
-						diffuse_light += l.intensity*std::max(T(0), light_dir*std::get<3>(hit_spot)); 
-					} 
-					color = diffuse_light*std::get<4>(hit_spot); 
-				}
 			} 
 			m_BufferMut.lock(); 
-			frame[r.pc.y*m_Width + r.pc.x] = color; 
+			frame[r.pc.y*m_Width + r.pc.x] = r.color; 
 			m_BufferMut.unlock(); 
 		} 
 		m_OutMut.lock(); 
