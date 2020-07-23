@@ -87,7 +87,7 @@ public:
 
 				gx_point = ray.origin + lx_point.t*ray.dir; 
 
-				dist = lx_point.t; 
+				dist = (lx_point.t*ray.dir).length();  
 
 				return true; 
 			} 
