@@ -42,7 +42,10 @@ export int main()
 	Vec<float> p_v7{  2.0f, -2.0f, 0.0f }; 
 	Vec<float> p_v8{  2.0f,  2.0f, 0.0f }; 
 
-	Vec<float> refl{0.1f, 0.1f, 0.1f}; 
+	Vec<float> refl0{ 0.6f, 0.3f, 0.1f, 0.0f}; 
+	Vec<float> refl1{ 0.0f, 0.5f, 0.1f, 0.8f}; 
+	Vec<float> refl2{ 0.9f, 0.1f, 0.0f, 0.0f}; 
+	Vec<float> refl3{0.0f, 10.0f, 0.8f, 0.0f}; 
 	Vec<float> color0{1.0f, 0.0f, 0.0f}; 
 	Vec<float> color1{0.0f, 1.0f, 0.0f}; 
 	Vec<float> color2{0.0f, 0.0f, 1.0f}; 
@@ -50,12 +53,12 @@ export int main()
 	Vec<float> color4{0.0f, 1.0f, 1.0f}; 
 	Vec<float> color5{1.0f, 1.0f, 0.0f}; 
 
-	OpticalSurface<float> opt_s0{0.0f, refl, color0}; 
-	OpticalSurface<float> opt_s1{0.0f, refl, color1}; 
-	OpticalSurface<float> opt_s2{0.0f, refl, color2}; 
-	OpticalSurface<float> opt_s3{0.0f, refl, color3}; 
-	OpticalSurface<float> opt_s4{0.0f, refl, color4}; 
-	OpticalSurface<float> opt_s5{0.0f, refl, color5}; 
+	OpticalSurface<float> opt_s0{50.0f, refl0, color0}; 
+	OpticalSurface<float> opt_s1{125.0f, refl2, color1}; 
+	OpticalSurface<float> opt_s2{10.0f, refl0, color2}; 
+	OpticalSurface<float> opt_s3{1425.0f, refl2, color3}; 
+	OpticalSurface<float> opt_s4{0.0f, refl0, color4}; 
+	OpticalSurface<float> opt_s5{0.0f, refl2, color5}; 
 	OpticalBulk<float> opt_b{1.0f, 1.0f};  
 
 	Polygon<float> m_p0{m_v0, m_v4, m_v1}; 
