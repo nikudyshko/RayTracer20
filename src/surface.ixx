@@ -31,6 +31,6 @@ public:
 
     // Returns the geometry of Surface  
     const Polygon<T>& get_polygon() const noexcept { return m_Geom; } 
-    // Returns the color of Surface color of given coordinates 
-    Vec<T> get_color(const Vec<T>& coords) const noexcept { return m_SurfOpt.color; } 
+    // Returns the Surface optic properties of a given coordinates 
+    OpticalSurface<T> get_surf_opt(const Vec<T>& coords) const noexcept { return m_SurfOpt; }
 }; 
