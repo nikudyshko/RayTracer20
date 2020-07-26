@@ -11,14 +11,7 @@ import ray;
 import light; 
 import shell; 
 import camera; 
-
-template<typename T> 
-struct RenderNode 
-{ 
-	RenderNode<T>* parent_node{nullptr}; 
-	std::vector< RenderNode<T>* > child_nodes{}; 
-	Shell<T> sh{}; 
-}; 
+import render_constants; 
 
 // Class to implement a rendering cycle 
 export template<typename T> 
@@ -31,62 +24,63 @@ private:
 	bool m_HasCamera{false}; 
 	// Flag to show if the Renderer has a scene 
 	bool m_HasScene{false}; 
-	// Flag to show if the Renderer has a Rendering Tree 
-	bool m_HasRenderingTree{false}; 
 	// Camera resolution 
 	size_t m_Width{}, m_Height{}; 
 	// Lights 
 	std::vector< Light<T> > lights{}; 
 	// Camera 
 	Camera<T> m_Camera{}; 
-	// Shell, that contains other shells and represents a scene 
-	Shell<T> m_Scene{}; 
-	// Rendering tree 
-	RenderNode<T>* m_RenderingTree{nullptr}; 
+	// Array of Shells, represents a scene 
+	std::vector< Shell<T> > m_Scene{}; 
 
-	std::mutex m_BufferMut, m_OutMut;  
+	std::mutex m_BufferMut, m_OutMut; 
 
-	// Function, that performs a recurrent build of rendering tree 
-	RenderNode<T>* add_render_nodes(RenderNode<T>* parent_node, const Shell<T>& sh) 
+	// Casts a ray 
+	void cast_ray(size_t depth, Ray<T>& ray) 
 	{ 
-		RenderNode<T>* node = new RenderNode<T>(); 
-
-		node->parent_node = parent_node; 
-		node->sh = sh; 
-
-		const std::vector< Shell<T> >& inner_shells = sh.get_inner_shells(); 
-		for (const Shell<T>& shell : inner_shells) 
+		if (depth < MAX_DEPTH) 
 		{ 
-			RenderNode<T>* child_node = add_render_nodes(node, shell); 
-			node->child_nodes.push_back(child_node); 
-		} 
+			for (Shell<T>& sh : m_Scene) 
+			{ 
+				if (sh.hit_sphere(ray)) 
+					sh.path_trace(depth, ray); 
+			}
+		}
+	}
 
-		return node; 
-	} 
-
-	// Function, that performs recurrent ray-tracing 
-	void ray_trace(std::vector< Ray<T> >& rays, std::vector< Vec<T> >& frame, RenderNode<T>* render_node) 
+	// Function, that performs recurrent path-tracing 
+	void path_trace(std::vector< Ray<T> >& rays) 
 	{ 
-		size_t hited = 0; 
-		size_t traced = 0; 
 		for (Ray<T>& r : rays) 
 		{ 
-			r.color = {T(0.2), T(0.3), T(0.7)}; 
-			if (render_node->sh.hit_sphere(r))  
-			{ 
-				++hited; 
-				if (render_node->sh.trace(r, lights)) 
-					++traced; 
-			} 
+			cast_ray(0, r); 
+		} 
+	} 
+
+	// Function, that performs reccurent light-shadow tracing 
+	void light_shadow_trace(std::vector< Ray<T> >& rays) 
+	{ 
+		for (Ray<T>& r : rays) 
+		{ 
+			for (Shell<T>& sh : m_Scene) 
+				sh.light_shadow_trace(0, r, lights); 
+		}
+	}
+
+	// Blends tracing results into a picture buffer 
+	void blend(std::vector< Ray<T> >& rays, std::vector< Vec<T> >& frame) 
+	{ 
+		Vec<T> color{}; 
+		for (Ray<T>& r : rays) 
+		{ 
+			color = {T(0.2), T(0.3), T(0.7)}; 
+			if (r.hit) 
+				color = r.color; 
 			m_BufferMut.lock(); 
-			frame[r.pc.y*m_Width + r.pc.x] = r.color; 
+			frame[r.pc.y*m_Width + r.pc.x] = color; 
 			m_BufferMut.unlock(); 
 		} 
-		m_OutMut.lock(); 
-		std::cout << "Hited: " << hited << '\n'; 
-		std::cout << "Traced: " << traced << '\n'; 
-		m_OutMut.unlock(); 
-	} 
+	}
 
 public: 
 	// Default constructor 
@@ -110,24 +104,20 @@ public:
 	} 
 
 	// Sets the scene 
-	void set_scene(const Shell<T>& scene) 
+	template<typename Container> 
+	void set_scene(const Container& scene) 
 	{ 
-		m_Scene = scene; 
-		m_HasScene = true; 
+		m_Scene.clear(); 
+		std::copy(scene.begin(), scene.end(), std::back_inserter(m_Scene)); 
+		for (size_t i = 0; i < m_Scene.size(); ++i) 
+			m_Scene[i].set_shell_id(i); 
+		m_HasScene = m_Scene.size() > 0; 
 	} 
-
-	// Builds Rendering Tree 
-	void build_rendering_tree() 
-	{ 
-		assert(m_HasScene); 
-		m_RenderingTree = add_render_nodes(nullptr, m_Scene); 
-		m_HasRenderingTree = true; 
-	}
 
 	// Function, that performs a rendering 
 	void render() 
 	{ 
-		assert(m_HasLights && m_HasCamera && m_HasScene && m_HasRenderingTree); 
+		assert(m_HasLights && m_HasCamera && m_HasScene); 
 		const std::vector< Ray<T> >& rays = m_Camera.get_rays(); 
 		std::vector< Vec<T> > framebuffer(rays.size()); 
 
@@ -141,10 +131,22 @@ public:
 		std::vector< std::thread > threads(core_count); 
 
 		for (size_t i = 0; i < core_count; ++i) 
-			threads[i] = std::thread(&Renderer::ray_trace, this, std::ref(thread_rays[i]), std::ref(framebuffer), m_RenderingTree); 
+			threads[i] = std::thread(&Renderer::path_trace, this, std::ref(thread_rays[i])); 
 		
 		for (std::thread& t : threads) 
 		    t.join(); 
+
+		for (size_t i = 0; i < core_count; ++i) 
+			threads[i] = std::thread(&Renderer::light_shadow_trace, this, std::ref(thread_rays[i])); 
+
+		for (std::thread& t : threads) 
+			t.join(); 
+
+		for (size_t i = 0; i < core_count; ++i) 
+			threads[i] = std::thread(&Renderer::blend, this, std::ref(thread_rays[i]), std::ref(framebuffer)); 
+
+		for (std::thread& t : threads) 
+			t.join(); 
 
 		save_ppm(m_Width, m_Height, framebuffer); 
 	} 
