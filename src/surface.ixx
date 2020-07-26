@@ -11,6 +11,8 @@ export template<typename T>
 class Surface 
 { 
 private: 
+    // ID given by Shell  
+    size_t m_SurfaceID{0}; 
     // m_Geom - geometrical properties of Surface
     Polygon<T> m_Geom{}; 
     // m_SurfOpt - optical properties of Surface 
@@ -23,6 +25,14 @@ public:
             const OpticalSurface<T> s) : 
         m_Geom{p}, 
         m_SurfOpt{s} {}; 
+
+    inline 
+    void set_surface_id(size_t id) noexcept 
+    { m_SurfaceID = id; } 
+
+    inline 
+    size_t get_surface_id() const noexcept 
+    { return m_SurfaceID; } 
 
     // Sets the geometry of Surface 
     void set_polygon(const Polygon<T>& p) { m_Geom = Polygon<T>(p); } 
