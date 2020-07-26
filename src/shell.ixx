@@ -24,6 +24,8 @@ private:
 	bool m_HasMesh{false}; 
 	// Flag to check if the Shell has Bound Sphere 
 	bool m_HasBoundSphere{false}; 
+	// ID given by Renderer 
+	size_t m_ShellID{0}; 
 	// Bound Sphere radius 
 	T m_BoundRadius{}; 
 
@@ -35,13 +37,6 @@ private:
 
 	// Mesh. Represents geometry of Shell  
 	std::vector< Surface<T> > m_Mesh{}; 
-
-	// Rays, that hit Bound Sphere. Should be 
-	// properly traced against every Surface element 
-	std::vector< Vec<T> > m_TestRays{}; 
-
-	// Inner Shells  
-	std::vector< Shell<T> > m_InnerShells{}; 
 public: 
 	// Default constructor 
 	Shell() {} 
@@ -50,10 +45,19 @@ public:
 		m_BulkOpt{bulk_opt}, m_Mesh{} {} 
 	// Constructs a Shell from only mesh 
 	Shell(std::initializer_list< Surface<T> > mesh) : 
-		m_BulkOpt{}, m_Mesh{mesh}, m_HasMesh{true} {} 
-	// Constructs a Shell from other Shells 
-	Shell(std::initializer_list< Shell<T> > inner_shells) : 
-		m_BulkOpt{}, m_Mesh{}, m_InnerShells{inner_shells} {} 
+		m_BulkOpt{}, m_Mesh{mesh}, m_HasMesh{true} 
+	{
+		for (size_t i = 0; i < m_Mesh.size(); ++i) 
+			m_Mesh[i].set_shell_id(i); 
+	} 
+
+	inline 
+	void set_shell_id(size_t id) noexcept 
+	{ m_ShellID = id; } 
+
+	inline 
+	size_t get_shell_id() const noexcept 
+	{ return m_ShellID; } 
 
 	// Function to set optical properties 
 	void set_opt_prop(const OpticalBulk<T>& bulk_opt) { m_BulkOpt = OpticalBulk<T>(bulk_opt); } 
@@ -61,6 +65,7 @@ public:
 	void add_surface(Surface<T> surf) 
 	{ 
 		m_Mesh.push_back(surf); 
+		m_Mesh.back().set_shell_id(m_Mesh.size() - 1); 
 		m_HasMesh = true; 
 	} 
 	// Function to set a complete mesh 
@@ -70,15 +75,10 @@ public:
 		assert((std::is_same<Container::value_type, Surface<T>>::value)); 
 		m_Mesh.clear(); 
 		std::copy(mesh.begin(), mesh.end(), std::back_inserter(m_Mesh)); 
+		for (size_t i = 0; i < m_Mesh.size(); ++i) 
+			m_Mesh[i].set_surface_id(i); 
 		m_HasMesh = true; 
 	} 
-	// Function to add inner Shells 
-	void add_inner_shell(const Shell<T>& sh) 
-	{ m_InnerShells.push_back(sh); } 
-
-	// Returns a vector of inner Shells 
-	const std::vector< Shell<T> >& get_inner_shells() const 
-	{ return m_InnerShells; } 
 
 	// Sets the bound sphere 
 	void set_bound_sphere(T bound_radius, const Vec<T>& bound_origin) 
@@ -145,46 +145,82 @@ public:
 		return false; 
 	} 
 
-	// Traces the Ray 
-	bool trace(Ray<T>& r, const std::vector< Light<T> >& lights) 
+	// Traces the path of Ray 
+	bool path_trace(size_t depth, Ray<T>& r) 
 	{ 
 		assert(m_HasMesh); 
-		bool hitted{false}; 
-		size_t idx{0}; 
-		T dist{T(0)}, max_dist{std::numeric_limits<T>::max()}; 
-		Vec<T> lx_temp{}, gx_temp{}; 
+		bool hit{false}; 
+		T dist{T(0)}, max_dist{r.hit_spots[depth].dist}; 
 		Vec<T> lx_point{}, gx_point{}; 
-		Vec<T> norm{}; 
-		for (size_t i = 0; i < m_Mesh.size(); ++i)
-			if (m_Mesh[i].get_polygon().ray_intersect(r, dist, lx_temp, gx_temp)) 
+		for (const Surface<T>& s : m_Mesh) 
+			if (s.get_polygon().ray_intersect(r, dist, lx_point, gx_point)) 
 			{ 
-				hitted = true; 
 				if (dist < max_dist) 
 				{ 
+					hit = true; 
 					max_dist = dist; 
-					idx = i; 
-					lx_point = lx_temp; 
-					gx_point = gx_temp; 
-					norm = m_Mesh[i].get_polygon().get_normal(); 
-				} 
+					r.hit = hit; 
+					r.hit_spots[depth] = {m_ShellID, s.get_surface_id(), dist, lx_point, gx_point, s.get_polygon().get_normal(), s.get_surf_opt(lx_point)}; 
+				}
 			} 
-		if (hitted) 
+		return hit;  
+	} 
+
+	// Traces lights and shadows 
+	bool light_shadow_trace(size_t depth, Ray<T>& r, const std::vector< Light<T> >& lights) 
+	{ 
+		assert(m_HasMesh); 
+
+		bool shadowed{false}; 
+
+		if (r.hit_spots.find(depth) != r.hit_spots.end()) 
 		{ 
 			T diffuse_light{T(0)}; 
 			T specular_light{T(0)}; 
 
-			OpticalSurface<T> s = m_Mesh[idx].get_surf_opt(lx_point); 
+			size_t shell_id = r.hit_spots[depth].shell_id; 
+			size_t surface_id = r.hit_spots[depth].surface_id; 
+			Vec<T> gx_point = r.hit_spots[depth].gx_point; 
+			Vec<T> norm = r.hit_spots[depth].normal; 
+			OpticalSurface<T> s = r.hit_spots[depth].mat; 
+
+			Ray<T> shadow_ray{}; 
+
+			T dist{}; 
+			Vec<T> lx_temp{}, gx_temp{}, shadow_origin{}; 
 
 			for (const Light<T>& l : lights) 
 			{ 
+				shadowed = false; 
+				T light_distance = (l.position - gx_point).length(); 
 				Vec<T> light_dir = (l.position - gx_point).normalize(); 
-				T light_norm = light_dir*norm; 
-				Vec<T> reflect = light_dir - T(2)*light_norm*norm; 
-				diffuse_light += l.intensity*std::max(T(0), light_norm); 
-				specular_light += l.intensity*std::pow(std::max(T(0), -reflect*r.dir), s.specular); 
+				T light_norm = light_dir*norm;  
+
+				shadow_ray = { gx_point, light_dir }; 
+
+				for (const Surface<T>& s : m_Mesh) 
+				{ 
+					if (s.get_polygon().ray_intersect(shadow_ray, dist, lx_temp, gx_temp) && 
+						((l.position - gx_temp).length() < light_distance) && 
+						!((m_ShellID == shell_id) && (s.get_surface_id() == surface_id)))  
+					{ 
+						shadowed = true; 
+						break; 
+					}
+				} 
+
+				if (!shadowed) 
+				{ 
+					Vec<T> reflect = light_dir - T(2)*light_norm*norm; 
+					diffuse_light += l.intensity*std::max(T(0), light_norm); 
+					specular_light += l.intensity*std::pow(std::max(T(0), -reflect*r.dir), s.specular); 
+				} 
 			} 
-			r.color = diffuse_light*s.reflection[0]*s.color + specular_light*s.reflection[1]*Vec<T>{T(1), T(1), T(1)}; 
-		}
-		return hitted;  
+			r.lighting[depth].diffuse_lights.push_back(diffuse_light); 
+			r.lighting[depth].specular_lights.push_back(specular_light); 
+			r.color = diffuse_light*s.reflection[0]*s.color + Vec<T>{specular_light*s.reflection[1]}; 
+		} 
+
+		return shadowed; 
 	}
 }; 
