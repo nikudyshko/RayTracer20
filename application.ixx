@@ -105,23 +105,22 @@ export int main()
 	Surface<float> p_s6{p_p6, opt_s1}; 
 	Surface<float> p_s7{p_p7, opt_s0}; 
 
-	// std::vector< Surface<float> > mesh{m_s0, m_s1, m_s2, m_s3, m_s4, m_s5}; 
-	// std::vector< Surface<float> > plane{p_s0, p_s1, p_s2, p_s3, p_s4, p_s5, p_s6, p_s7}; 
+	std::vector< Surface<float> > plane_mesh{p_s0, p_s1, p_s2, p_s3, p_s4, p_s5, p_s6, p_s7}; 
+	std::vector< Surface<float> > pyramid_mesh{m_s0, m_s1, m_s2, m_s3, m_s4, m_s5}; 
 
-	// Shell<float> m_sh{}; 
-	// m_sh.set_opt_prop(opt_b); 
-	// m_sh.add_surfaces(mesh); 
-	// m_sh.calc_bound_sphere(); 
-	// Shell<float> p_sh{}; 
-	// p_sh.add_surfaces(plane); 
-	// p_sh.add_inner_shell(m_sh); 
-	// p_sh.calc_bound_sphere(); 
+	Shell<float> plane{}; 
+	plane.set_opt_prop(opt_b); 
+	plane.add_surfaces(plane_mesh); 
+	plane.calc_bound_sphere(); 
 
-	std::vector< Surface<float> > mesh{m_s0, m_s1, m_s2, m_s3, m_s4, m_s5, p_s0, p_s1, p_s2, p_s3, p_s4, p_s5, p_s6, p_s7}; 
-	Shell<float> p_sh{}; 
-	p_sh.set_opt_prop(opt_b); 
-	p_sh.add_surfaces(mesh); 
-	p_sh.calc_bound_sphere(); 
+	Shell<float> pyramid{}; 
+	pyramid.set_opt_prop(opt_b); 
+	pyramid.add_surfaces(pyramid_mesh); 
+	pyramid.calc_bound_sphere(); 
+
+	std::vector< Shell<float> > scene{}; 
+	scene.push_back(plane); 
+	scene.push_back(pyramid); 
 
 	Vec<float> origin{3.0f, 3.0f, 3.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
@@ -139,8 +138,7 @@ export int main()
 	rend.add_light(l2); 
 	rend.add_light(l3); 
 	rend.set_camera(cam); 
-	rend.set_scene(p_sh); 
-	rend.build_rendering_tree(); 
+	rend.set_scene(scene); 
 	rend.render(); 
 
 	Mat<float> m = Mat<float>{ 
