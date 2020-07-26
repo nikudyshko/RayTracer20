@@ -5,11 +5,31 @@ export module ray;
 import std.core; 
 
 import vec; 
+import material; 
+
+// Struct that describes hit_spot 
+export template<typename T> 
+struct HitSpot 
+{ 
+	size_t shell_id{}, surface_id{};  
+	T dist{std::numeric_limits<T>::max()}; 
+	Vec<T> lx_point{}, gx_point{}, normal{}; 
+	OpticalSurface<T> mat{}; 
+}; 
+
+// Struct that describes lighting properties 
+export template<typename T> 
+struct Lighting 
+{ 
+	std::vector<T> diffuse_lights{}, specular_lights{}; 
+}; 
 
 // Ray structure 
 export template<typename T> 
 struct Ray 
 { 
+	// Flag to show, if the Ray hit the surface 
+	bool hit{false}; 
 	// Intensity of the light 
 	T intensity{}; 
 	// origin - origin of the ray 
@@ -21,10 +41,12 @@ struct Ray
 
 	// Color of the pixel 
 	Vec<T> color{}; 
-	
-	// Hit spots map, contains distance (key), local coordinates, global coordinates and color  
-	// Automatically sorts via keys (distance) 
-	std::map< T, std::tuple<size_t, Vec<T>, Vec<T>, Vec<T>, Vec<T>> > hit_spots{}; 
+
+	// Hit spots map. Contains render depth as key value, and a HitSpot struct as a value 
+	std::unordered_map< size_t, HitSpot<T> > hit_spots{}; 
+
+	// Lighting map. Contains render depth as key value, and Lighting struct as a value 
+	std::unordered_map< size_t, Lighting<T> > lighting{}; 
 
 	// Default constructor 
 	inline 
