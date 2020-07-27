@@ -53,7 +53,7 @@ public:
 	// Code to check if the Ray intersects the Polygon, Moller-Trumbore algortihm 
 	// ray - ray to check, dist - distance to hit point, lx_point - local coordinates of hit point, 
 	// gx_point - global coordinates of hit point 
-	bool ray_intersect (const Ray<T>& ray, T& dist, Vec<T>& lx_point, Vec<T>& gx_point) const 
+	bool ray_intersect (const Ray<T>& ray, T& sq_dist, Vec<T>& lx_point, Vec<T>& gx_point) const 
 	{ 
 		assert(m_HasNormal); 
 
@@ -87,7 +87,7 @@ public:
 
 				gx_point = ray.origin + lx_point.t*ray.dir; 
 
-				dist = (lx_point.t*ray.dir).length();  
+				sq_dist = (lx_point.t*ray.dir).sq_norm();   
 
 				return true; 
 			} 
