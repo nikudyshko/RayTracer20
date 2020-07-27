@@ -13,6 +13,16 @@ export template<typename T>
 requires std::default_initializable<T> && sim_arithm<T> && math_fun<T> 
 struct Vec 
 { 
+private: 
+	// Flag to check if vector has precalculated length 
+	bool m_HasLength{false}; 
+	// Flag to check if vector has precalculated square norm 
+	bool m_HasSqNorm{false}; 
+	// Vector length 
+	T m_Length{T(0)}; 
+	// Vector square norm 
+	T m_SqNorm{T(0)}; 
+public: 
 	// Store inner type for further checks 
 	using v_type = T; 
 	// Use union to make memory accessible via different ways 
@@ -55,6 +65,10 @@ struct Vec
 		y = rhs.y; 
 		z = rhs.z; 
 		w = rhs.w; 
+
+		m_HasLength = false; 
+		m_HasSqNorm = false; 
+
 		return *this; 
 	} 
 
@@ -109,6 +123,9 @@ struct Vec
 	Vec<T>& operator= (U rhs) 
 	{ 
 		x = y = z = w = T(rhs); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	}
 
@@ -122,6 +139,9 @@ struct Vec
 		y = T(rhs.y); 
 		z = T(rhs.z); 
 		w = T(rhs.w); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	} 
 
@@ -135,6 +155,9 @@ struct Vec
 		y += T(rhs); 
 		z += T(rhs); 
 		w += T(rhs); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	} 
 
@@ -148,6 +171,9 @@ struct Vec
 		y += T(rhs.y); 
 		z += T(rhs.z); 
 		w += T(rhs.w); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	} 
 
@@ -161,6 +187,9 @@ struct Vec
 		y -= T(rhs); 
 		z -= T(rhs); 
 		w -= T(rhs); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	}
 
@@ -174,6 +203,9 @@ struct Vec
 		y -= T(rhs.y); 
 		z -= T(rhs.z); 
 		w -= T(rhs.w); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	} 
 
@@ -187,12 +219,48 @@ struct Vec
 		y *= T(rhs); 
 		z *= T(rhs); 
 		w *= T(rhs); 
+
+		invalidate_flags(); 
+
 		return *this; 
 	} 
 
-	// Calculate the lentgh of vector 
+	// Invalidates m_HasLength and m_HasSqNorm flags 
 	inline 
-	T length () const { return std::sqrt(x*x + y*y + z*z + w*w); } 
+	void invalidate_flags() 
+	{ 
+		m_HasLength = false; 
+		m_HasSqNorm = false; 
+	}
+
+	// Calculate the length of vector 
+	inline 
+	T length () 
+	{ 
+		if (!m_HasLength)  
+		{ 
+			m_SqNorm = x*x + y*y + z*z + w*w; 
+			m_Length = std::sqrt(m_SqNorm); 
+
+			m_HasLength = true; 
+			m_HasSqNorm = true; 
+
+		}
+		return m_Length; 
+	} 
+
+	// Calculate the square norm of vector 
+	inline 
+	T sq_norm () 
+	{ 
+		if (!m_HasSqNorm) 
+		{ 
+			m_SqNorm = x*x + y*y + z*z + w*w; 
+
+			m_HasSqNorm = true; 
+		} 
+		return m_SqNorm; 
+	}
 
 	// Normalization of vector 
 	template<typename U = T> 
@@ -201,6 +269,9 @@ struct Vec
 	Vec<T> normalize (U scale = U(1)) 
 	{ 
 		T s = T(scale)/length(); 
+
+		invalidate_flags(); 
+
 		return { x*s, y*s, z*s, w*s }; 
 	} 
 }; 
@@ -247,6 +318,7 @@ auto operator* (T lhs, Vec<U>&& rhs) -> Vec<U>&
 	rhs.y *= U(lhs); 
 	rhs.z *= U(lhs); 
 	rhs.w *= U(lhs); 
+	rhs.invalidate_flags();  
 	return rhs; 
 } 
 
@@ -270,6 +342,7 @@ auto operator* (Vec<T>&& lhs, U rhs) -> Vec<T>&&
 	lhs.y *= T(rhs); 
 	lhs.z *= T(rhs); 
 	lhs.w *= T(rhs); 
+	lhs.invalidate_flags(); 
 	return std::move(lhs); 
 } 
 
@@ -335,6 +408,7 @@ auto operator^ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>&&
 			U(lhs.z)*rhs.x - U(lhs.x)*rhs.z, 
 			U(lhs.x)*rhs.y - U(lhs.y)*rhs.x, 
 			U()	}; 
+	rhs.invalidate_flags(); 
 	return std::move(rhs); 
 } 
 
@@ -348,6 +422,7 @@ auto operator^ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>&&
 			lhs.z*T(rhs.x) - lhs.x*T(rhs.z), 
 			lhs.x*T(rhs.y) - lhs.y*T(rhs.x), 
 			T() }; 
+	lhs.invalidate_flags(); 
 	return std::move(lhs); 
 } 
 
@@ -364,6 +439,7 @@ auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)>&&
 				lhs.z*T(rhs.x) - lhs.x*T(rhs.z), 
 				lhs.x*T(rhs.y) - lhs.y*T(rhs.x), 
 				T() }; 
+		lhs.invalidate_flags(); 
 		return std::move(lhs); 
 	} 
 	else 
@@ -372,6 +448,7 @@ auto operator^ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x*rhs.y)>&&
 				U(lhs.z)*rhs.z - U(lhs.x)*rhs.z, 
 				U(lhs.x)*rhs.y - U(lhs.y)*rhs.x, 
 				U() }; 
+		rhs.invalidate_flags(); 
 		return std::move(rhs); 
 	} 
 } 
@@ -398,6 +475,7 @@ auto operator+ (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>&&
 	rhs.y += U(lhs.y); 
 	rhs.z += U(lhs.z); 
 	rhs.w += U(lhs.w); 
+	rhs.invalidate_flags(); 
 	return std::move(rhs); 
 } 
 
@@ -411,6 +489,7 @@ auto operator+ (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>&&
 	lhs.y += T(rhs.y); 
 	lhs.z += T(rhs.z); 
 	lhs.w += T(rhs.w); 
+	lhs.invalidate_flags(); 
 	return std::move(lhs); 
 } 
 
@@ -427,6 +506,7 @@ auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>&&
 		lhs.y += T(rhs.y); 
 		lhs.z += T(rhs.z); 
 		lhs.w += T(rhs.w); 
+		lhs.invalidate_flags(); 
 		return std::move(lhs); 
 	} 
 	else 
@@ -435,6 +515,7 @@ auto operator+ (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x + rhs.x)>&&
 		rhs.y += U(lhs.y); 
 		rhs.z += U(lhs.z); 
 		rhs.w += U(lhs.w); 
+		rhs.invalidate_flags(); 
 		return std::move(rhs); 
 	} 
 } 
@@ -461,7 +542,9 @@ auto operator- (const Vec<T>& lhs, Vec<U>&& rhs) -> Vec<U>&&
 	rhs.y -= U(lhs.y); 
 	rhs.z -= U(lhs.z); 
 	rhs.w -= U(lhs.w); 
-	return std::move(-rhs); 
+	rhs = -rhs; 
+	rhs.invalidate_flags(); 
+	return std::move(rhs); 
 } 
 
 // Vector-Vector substraction with rvalue 
@@ -474,6 +557,7 @@ auto operator- (Vec<T>&& lhs, const Vec<U>& rhs) -> Vec<T>&&
 	lhs.y -= T(rhs.y); 
 	lhs.z -= T(rhs.z); 
 	lhs.w -= T(rhs.w); 
+	lhs.invalidate_flags(); 
 	return std::move(lhs); 
 } 
 
@@ -490,6 +574,7 @@ auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)>&&
 		lhs.y -= T(rhs.y); 
 		lhs.z -= T(rhs.z); 
 		lhs.w -= T(rhs.w); 
+		lhs.invalidate_flags(); 
 		return std::move(lhs); 
 	} 
 	else 
@@ -498,6 +583,7 @@ auto operator- (Vec<T>&& lhs, Vec<U>&& rhs) -> Vec<decltype(lhs.x - rhs.x)>&&
 		rhs.y -= U(lhs.y); 
 		rhs.z -= U(lhs.z); 
 		rhs.w -= U(lhs.w); 
+		rhs.invalidate_flags(); 
 		return std::move(-rhs); 
 	} 
 } 
