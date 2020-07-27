@@ -12,7 +12,7 @@ export template<typename T>
 struct HitSpot 
 { 
 	size_t shell_id{}, surface_id{};  
-	T dist{std::numeric_limits<T>::max()}; 
+	T sq_dist{std::numeric_limits<T>::max()}; 
 	Vec<T> lx_point{}, gx_point{}, normal{}; 
 	OpticalSurface<T> mat{}; 
 }; 
