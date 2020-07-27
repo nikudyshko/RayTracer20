@@ -139,18 +139,11 @@ export int main()
 	rend.add_light(l3); 
 	rend.set_camera(cam); 
 	rend.set_scene(scene); 
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_Start = std::chrono::high_resolution_clock::now(); 
 	rend.render(); 
-
-	Mat<float> m = Mat<float>{ 
-		Vec<float>{ 1.0f,  2.0f,  3.0f,  4.0f}, 
-		Vec<float>{ 5.0f,  6.0f,  7.0f,  8.0f}, 
-		Vec<float>{ 9.0f, 10.0f, 11.0f, 12.0f}, 
-		Vec<float>{13.0f, 14.0f, 15.0f, 16.0f} 
-	}; 
-
-	Vec<float> v = { 17.0f, 18.0f, 19.0f, 20.0f }; 
-	Vec<float> r = m*v; 
-	std::cout << r << '\n'; 
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_Stop = std::chrono::high_resolution_clock::now(); 
+	int ms = std::chrono::duration_cast<std::chrono::milliseconds>(m_Stop - m_Start).count(); 
+	std::cout << "Render time: " << ms << " ms\n"; 
 
 	return 0; 
 } 
