@@ -150,17 +150,17 @@ public:
 	{ 
 		assert(m_HasMesh); 
 		bool hit{false}; 
-		T dist{T(0)}, max_dist{r.hit_spots[depth].dist}; 
+		T sq_dist{T(0)}, sq_max_dist{r.hit_spots[depth].sq_dist}; 
 		Vec<T> lx_point{}, gx_point{}; 
 		for (const Surface<T>& s : m_Mesh) 
-			if (s.get_polygon().ray_intersect(r, dist, lx_point, gx_point)) 
+			if (s.get_polygon().ray_intersect(r, sq_dist, lx_point, gx_point)) 
 			{ 
-				if (dist < max_dist) 
+				if (sq_dist < sq_max_dist) 
 				{ 
 					hit = true; 
-					max_dist = dist; 
+					sq_max_dist = sq_dist; 
 					r.hit = hit; 
-					r.hit_spots[depth] = {m_ShellID, s.get_surface_id(), dist, lx_point, gx_point, s.get_polygon().get_normal(), s.get_surf_opt(lx_point)}; 
+					r.hit_spots[depth] = {m_ShellID, s.get_surface_id(), sq_dist, lx_point, gx_point, s.get_polygon().get_normal(), s.get_surf_opt(lx_point)}; 
 				}
 			} 
 		return hit;  
@@ -192,7 +192,7 @@ public:
 			for (const Light<T>& l : lights) 
 			{ 
 				shadowed = false; 
-				T light_distance = (l.position - gx_point).length(); 
+				T light_distance = (l.position - gx_point).sq_norm();  
 				Vec<T> light_dir = (l.position - gx_point).normalize(); 
 				T light_norm = light_dir*norm;  
 
@@ -201,7 +201,7 @@ public:
 				for (const Surface<T>& s : m_Mesh) 
 				{ 
 					if (s.get_polygon().ray_intersect(shadow_ray, dist, lx_temp, gx_temp) && 
-						((l.position - gx_temp).length() < light_distance) && 
+						((l.position - gx_temp).sq_norm() < light_distance) && 
 						!((m_ShellID == shell_id) && (s.get_surface_id() == surface_id)))  
 					{ 
 						shadowed = true; 
