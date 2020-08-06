@@ -42,11 +42,11 @@ struct Ray
 	// Color of the pixel 
 	Vec<T> color{}; 
 
-	// Hit spots map. Contains render depth as key value, and a HitSpot struct as a value 
-	std::unordered_map< size_t, HitSpot<T> > hit_spots{}; 
+	// Hit spots map. Contains render depth as a key and a HitSpot struct as value 
+	std::map< size_t, HitSpot<T> > hit_spots{}; 
 
-	// Lighting map. Contains render depth as key value, and Lighting struct as a value 
-	std::unordered_map< size_t, Lighting<T> > lighting{}; 
+	// Lighting map. Contains render depth as a key and Lighting struct as a value 
+	std::map< size_t, Lighting<T> > lighting{}; 
 
 	// Default constructor 
 	inline 
