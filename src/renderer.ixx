@@ -73,11 +73,21 @@ private:
 		Vec<T> color{}; 
 		for (Ray<T>& r : rays) 
 		{ 
-			color = {T(0.2), T(0.3), T(0.7)}; 
 			if (r.hit) 
-				color = r.color; 
+			{ 
+				color = 0; 
+				for (auto l_it = r.lighting.rbegin(); l_it != r.lighting.rend(); ++l_it) 
+				{ 
+					OpticalSurface<T> s = r.hit_spots[l_it->first].mat; 
+					Lighting<T> l = l_it->second; 
+					for (size_t i = 0; i < l.diffuse_lights.size(); ++i) 
+						color += l.diffuse_lights[i]*s.reflection[0]*s.color + Vec<T>{l.specular_lights[i]*s.reflection[1]}; 
+				}
+			} 
+			else 
+				color = {T(0.2), T(0.3), T(0.7)}; 
 			m_BufferMut.lock(); 
-			frame[r.pc.y*m_Width + r.pc.x] = color; 
+			frame[r.pc.y*m_Width + r.pc.x] = color;  
 			m_BufferMut.unlock(); 
 		} 
 	}
