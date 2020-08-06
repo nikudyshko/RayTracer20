@@ -216,9 +216,12 @@ public:
 					specular_light += l.intensity*std::pow(std::max(T(0), -reflect*r.dir), s.specular); 
 				} 
 			} 
-			r.lighting[depth].diffuse_lights.push_back(diffuse_light); 
-			r.lighting[depth].specular_lights.push_back(specular_light); 
-			r.color = diffuse_light*s.reflection[0]*s.color + Vec<T>{specular_light*s.reflection[1]}; 
+			if (!shadowed) 
+			{ 
+				r.lighting[depth].diffuse_lights.push_back(diffuse_light); 
+				r.lighting[depth].specular_lights.push_back(specular_light); 
+			} 
+			// r.color = r.lighting[depth].diffuse_lights.back()*s.reflection[0]*s.color + Vec<T>{r.lighting[depth].specular_lights.back()*s.reflection[1]}; 
 		} 
 
 		return shadowed; 
