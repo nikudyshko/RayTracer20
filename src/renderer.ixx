@@ -75,6 +75,7 @@ private:
 		{ 
 			if (r.hit) 
 			{ 
+				m_OutMut.lock(); 
 				color = 0; 
 				for (auto l_it = r.lighting.rbegin(); l_it != r.lighting.rend(); ++l_it) 
 				{ 
@@ -82,7 +83,7 @@ private:
 					Lighting<T> l = l_it->second; 
 					for (size_t i = 0; i < l.diffuse_lights.size(); ++i) 
 						color += l.diffuse_lights[i]*s.reflection[0]*s.color + Vec<T>{l.specular_lights[i]*s.reflection[1]}; 
-				}
+				} 
 			} 
 			else 
 				color = {T(0.2), T(0.3), T(0.7)}; 
