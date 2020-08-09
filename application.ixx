@@ -122,11 +122,11 @@ export int main()
 	scene.push_back(plane); 
 	scene.push_back(pyramid); 
 
-	Vec<float> origin{3.0f, 3.0f, 3.0f}; 
+	Vec<float> origin{0.0f, 0.0f, 3.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
 
 	Camera<float> cam{WIDTH, HEIGHT, 3.14f/3.0f, origin, look_at}; 
-	cam.calc_matrix({0.0f, 0.0f, -1.0f}); 
+	cam.calc_matrix({0.0f, 1.0f, 0.0f}); 
 	cam.calc_rays(); 
 
 	Renderer<float> rend{}; 
