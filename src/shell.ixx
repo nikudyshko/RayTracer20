@@ -221,7 +221,7 @@ public:
 				r.lighting[depth].diffuse_lights.push_back(diffuse_light); 
 				r.lighting[depth].specular_lights.push_back(specular_light); 
 			} 
-			// r.color = r.lighting[depth].diffuse_lights.back()*s.reflection[0]*s.color + Vec<T>{r.lighting[depth].specular_lights.back()*s.reflection[1]}; 
+			r.color = r.lighting[depth].diffuse_lights.back()*s.reflection[0]*s.color + Vec<T>{r.lighting[depth].specular_lights.back()*s.reflection[1]}; 
 		} 
 
 		return shadowed; 
