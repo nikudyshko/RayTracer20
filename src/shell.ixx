@@ -166,64 +166,28 @@ public:
 		return hit;  
 	} 
 
-	// Traces lights and shadows 
-	bool light_shadow_trace(size_t depth, Ray<T>& r, const std::vector< Light<T> >& lights) 
+	// Checks if the ray intersects polygons of the shell 
+	bool shadow_trace( 
+		size_t shell_id, 
+		size_t surface_id, 
+		T light_distance, 
+		const Ray<T>& shadow_ray, 
+		const Light<T>& light 
+	) const 
 	{ 
 		assert(m_HasMesh); 
 
-		bool shadowed{false}; 
+		T dist{}; 
+		Vec<T> lx_temp{}, gx_temp{};
 
-		if (r.hit_spots.find(depth) != r.hit_spots.end()) 
+		for (const Surface<T>& s : m_Mesh) 
 		{ 
-			T diffuse_light{T(0)}; 
-			T specular_light{T(0)}; 
-
-			size_t shell_id = r.hit_spots[depth].shell_id; 
-			size_t surface_id = r.hit_spots[depth].surface_id; 
-			Vec<T> gx_point = r.hit_spots[depth].gx_point; 
-			Vec<T> norm = r.hit_spots[depth].normal; 
-			OpticalSurface<T> s = r.hit_spots[depth].mat; 
-
-			Ray<T> shadow_ray{}; 
-
-			T dist{}; 
-			Vec<T> lx_temp{}, gx_temp{}, shadow_origin{}; 
-
-			for (const Light<T>& l : lights) 
-			{ 
-				shadowed = false; 
-				T light_distance = (l.position - gx_point).sq_norm();  
-				Vec<T> light_dir = (l.position - gx_point).normalize(); 
-				T light_norm = light_dir*norm;  
-
-				shadow_ray = { gx_point, light_dir }; 
-
-				for (const Surface<T>& s : m_Mesh) 
-				{ 
-					if (s.get_polygon().ray_intersect(shadow_ray, dist, lx_temp, gx_temp) && 
-						((l.position - gx_temp).sq_norm() < light_distance) && 
-						!((m_ShellID == shell_id) && (s.get_surface_id() == surface_id)))  
-					{ 
-						shadowed = true; 
-						break; 
-					}
-				} 
-
-				if (!shadowed) 
-				{ 
-					Vec<T> reflect = light_dir - T(2)*light_norm*norm; 
-					diffuse_light += l.intensity*std::max(T(0), light_norm); 
-					specular_light += l.intensity*std::pow(std::max(T(0), -reflect*r.dir), s.specular); 
-				} 
-			} 
-			if (!shadowed) 
-			{ 
-				r.lighting[depth].diffuse_lights.push_back(diffuse_light); 
-				r.lighting[depth].specular_lights.push_back(specular_light); 
-			} 
-			r.color = r.lighting[depth].diffuse_lights.back()*s.reflection[0]*s.color + Vec<T>{r.lighting[depth].specular_lights.back()*s.reflection[1]}; 
+			if (!((m_ShellID == shell_id) && (s.get_surface_id() == surface_id)) && 
+				s.get_polygon().ray_intersect(shadow_ray, dist, lx_temp, gx_temp) && 
+				((light.position - gx_temp).sq_norm() < light_distance)) 
+				return true; 
 		} 
 
-		return shadowed; 
+		return false; 
 	}
 }; 
