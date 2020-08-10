@@ -62,8 +62,41 @@ private:
 	{ 
 		for (Ray<T>& r : rays) 
 		{ 
-			for (Shell<T>& sh : m_Scene) 
-				sh.light_shadow_trace(0, r, lights); 
+			auto& hit_spots = r.hit_spots; 
+			for (auto hs_it = hit_spots.rbegin(); hs_it != hit_spots.rend(); ++hs_it) 
+			{ 
+				size_t shell_id = hs_it->second.shell_id; 
+				size_t surface_id = hs_it->second.surface_id; 
+				Vec<T>& gx_point = hs_it->second.gx_point; 
+				Vec<T>& norm = hs_it->second.normal; 
+				OpticalSurface<T>& s = hs_it->second.mat; 
+
+				T diffuse_light{T(0)}, specular_light{T(0)}; 
+
+				for (const Light<T>& l : lights) 
+				{ 
+					bool shadowed{false}; 
+					T light_distance{(l.position - gx_point).sq_norm()}; 
+					Vec<T> light_dir{(l.position - gx_point).normalize()}; 
+					Ray<T> shadow_ray{ gx_point, light_dir }; 
+
+					for (const Shell<T>& sh : m_Scene) 
+					{ 
+						if (shadowed = sh.shadow_trace(shell_id, surface_id, light_distance, shadow_ray, l)) 
+							break; 
+					} 
+
+					if (shadowed) 
+						continue; 
+
+					T light_norm = light_dir*norm; 
+					Vec<T> reflect{light_dir - T(2)*light_norm*norm}; 
+					diffuse_light += l.intensity*std::max(T(0), light_norm); 
+					specular_light += l.intensity*std::pow(std::max(T(0), -reflect*r.dir), s.specular); 
+				} 
+				r.lighting[hs_it->first].diffuse_lights.push_back(diffuse_light); 
+				r.lighting[hs_it->first].specular_lights.push_back(specular_light); 
+			}
 		}
 	}
 
@@ -75,12 +108,11 @@ private:
 		{ 
 			if (r.hit) 
 			{ 
-				m_OutMut.lock(); 
 				color = 0; 
 				for (auto l_it = r.lighting.rbegin(); l_it != r.lighting.rend(); ++l_it) 
 				{ 
-					OpticalSurface<T> s = r.hit_spots[l_it->first].mat; 
-					Lighting<T> l = l_it->second; 
+					OpticalSurface<T>& s = r.hit_spots[l_it->first].mat; 
+					Lighting<T>& l = l_it->second; 
 					for (size_t i = 0; i < l.diffuse_lights.size(); ++i) 
 						color += l.diffuse_lights[i]*s.reflection[0]*s.color + Vec<T>{l.specular_lights[i]*s.reflection[1]}; 
 				} 
