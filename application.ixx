@@ -118,15 +118,58 @@ export int main()
 	pyramid.add_surfaces(pyramid_mesh); 
 	pyramid.calc_bound_sphere(); 
 
+	Shell<float> pyramid1 = pyramid; 
+	Mat<float> t1 = { 
+		{1.0f, 0.0f, 0.0f, 1.0f}, 
+		{0.0f, 1.0f, 0.0f, 1.0f}, 
+		{0.0f, 0.0f, 1.0f, 0.0f}, 
+		{0.0f, 0.0f, 0.0f, 1.0f} 
+	}; 
+	pyramid1.transform(t1); 
+	pyramid1.repaint(opt_s0); 
+
+	Shell<float> pyramid2 = pyramid; 
+	Mat<float> t2 = { 
+		{1.0f, 0.0f, 0.0f, -1.0f}, 
+		{0.0f, 1.0f, 0.0f,  1.0f}, 
+		{0.0f, 0.0f, 1.0f,  0.0f}, 
+		{0.0f, 0.0f, 0.0f,  1.0f} 
+	}; 
+	pyramid2.transform(t2); 
+	pyramid2.repaint(opt_s1); 
+
+	Shell<float> pyramid3 = pyramid; 
+	Mat<float> t3 = { 
+		{1.0f, 0.0f, 0.0f, -1.0f}, 
+		{0.0f, 1.0f, 0.0f, -1.0f}, 
+		{0.0f, 0.0f, 1.0f,  0.0f}, 
+		{0.0f, 0.0f, 0.0f,  1.0f} 
+	}; 
+	pyramid3.transform(t3); 
+	pyramid3.repaint(opt_s2); 
+
+	Shell<float> pyramid4 = pyramid; 
+	Mat<float> t4 = { 
+		{1.0f, 0.0f, 0.0f,  1.0f}, 
+		{0.0f, 1.0f, 0.0f, -1.0f}, 
+		{0.0f, 0.0f, 1.0f,  0.0f}, 
+		{0.0f, 0.0f, 0.0f,  1.0f} 
+	}; 
+	pyramid4.transform(t4); 
+	pyramid4.repaint(opt_s3); 
+
 	std::vector< Shell<float> > scene{}; 
 	scene.push_back(plane); 
-	scene.push_back(pyramid); 
+	scene.push_back(pyramid1); 
+	scene.push_back(pyramid2); 
+	scene.push_back(pyramid3); 
+	scene.push_back(pyramid4); 
 
-	Vec<float> origin{0.0f, 0.0f, 3.0f}; 
+	Vec<float> origin{3.0f, 3.0f, 3.0f}; 
 	Vec<float> look_at{0.0f, 0.0f, 0.0f}; 
 
 	Camera<float> cam{WIDTH, HEIGHT, 3.14f/3.0f, origin, look_at}; 
-	cam.calc_matrix({0.0f, 1.0f, 0.0f}); 
+	cam.calc_matrix({0.0f, 0.0f, -1.0f}); 
 	cam.calc_rays(); 
 
 	Renderer<float> rend{}; 
