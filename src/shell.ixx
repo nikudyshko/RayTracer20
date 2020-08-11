@@ -7,6 +7,7 @@ export module shell;
 import std.core; 
 
 import vec; 
+import mat; 
 import ray; 
 import light; 
 import material; 
@@ -79,6 +80,30 @@ public:
 			m_Mesh[i].set_surface_id(i); 
 		m_HasMesh = true; 
 	} 
+
+	// Apply a matrix transofrmation to Shell 
+	void transform(const Mat<T>& matrix) 
+	{ 
+		for (Surface<T>& s : m_Mesh) 
+			s.transform(matrix); 
+		if (m_HasBoundSphere) 
+		{ 
+			m_BoundOrigin.w = T(1); 
+			m_BoundOrigin = matrix*m_BoundOrigin; 
+			m_BoundOrigin.w = T(0); 
+		} 
+	} 
+
+	// Sets surface optical properties of all Surfaces to a given value 
+	void repaint(const OpticalSurface<T>& opt) 
+	{ 
+		for (Surface<T>& s : m_Mesh) 
+			s.set_opt_prop(opt); 
+	} 
+
+	// Sets the bulk optical properties of a Shell to a given values 
+	void refill(const OpticalBulk<T>& opt) 
+	{ m_BulkOpt = opt; } 
 
 	// Sets the bound sphere 
 	void set_bound_sphere(T bound_radius, const Vec<T>& bound_origin) 
