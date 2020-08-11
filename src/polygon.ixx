@@ -7,6 +7,7 @@ export module polygon;
 import std.core; 
 
 import vec; 
+import mat; 
 import ray; 
 import render_constants; 
 
@@ -25,6 +26,23 @@ public:
 	// Contstructs polygon from three vertices 
 	Polygon (const Vec<T>& a, const Vec<T>& b, const Vec<T>& c) : 
 		m_A{a}, m_B{b}, m_C{c} {}; 
+
+	// Apply a matrix transform to every point of Polygon 
+	void transform(const Mat<T>& matrix) 
+	{ 
+		m_A.w = T(1); 
+		m_A = matrix*m_A; 
+		m_A.w = T(0); 
+		m_B.w = T(1); 
+		m_B = matrix*m_B; 
+		m_B.w = T(0); 
+		m_C.w = T(1); 
+		m_C = matrix*m_C; 
+		m_C.w = T(0); 
+
+		m_HasNormal = false; 
+		calc_normal(); 
+	} 
 
 	// Calculates normal of the polygon 
 	void calc_normal () 
