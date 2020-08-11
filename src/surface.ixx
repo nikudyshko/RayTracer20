@@ -3,6 +3,7 @@ module;
 export module surface; 
 
 import vec; 
+import mat; 
 import polygon; 
 import material; 
 
@@ -38,6 +39,10 @@ public:
     void set_polygon(const Polygon<T>& p) { m_Geom = Polygon<T>(p); } 
     // Sets the optical properties of Surface 
     void set_opt_prop(const OpticalSurface<T>& s) { m_SurfOpt = OpticalSurface<T>(s); } 
+
+    // Apply a matrix transform to Polygon 
+    void transform(const Mat<T>& matrix) 
+    { m_Geom.transform(matrix); } 
 
     // Returns the geometry of Surface  
     const Polygon<T>& get_polygon() const noexcept { return m_Geom; } 
