@@ -19,8 +19,6 @@ private:
 	bool m_HasRays{false}; 
 	// Width and Height of Camera (pixels) 
 	size_t m_Width{}, m_Height{}; 
-	// Index of the current Ray 
-	mutable size_t m_CurrentRay{}; 
 	// Cameras' fiels of view 
 	T m_FOV{}; 
 	// Cameras' aspect ratio 
@@ -30,11 +28,11 @@ private:
 	// CameraToWorld matrix 
 	Mat<T> m_CTWMatrix{};  
 	// Array of Rays 
-	std::vector< Ray<T> > m_Rays{}; 
+	std::vector< Ray<T> > m_Rays;  
 public: 
 	// Default constructor 
 	inline 
-	Camera() {} 
+	Camera() = default; 
 
 	// Construct a Camera width width, height, 
 	// FOV and origin, look-at parameters 
@@ -114,7 +112,7 @@ public:
 			for (size_t i = 0; i < m_Height; ++i) 
 			{ 
 				T dir_y = -((2*i + 1)/T(m_Height) - T(1))*std::tan(m_FOV/T(2.0)); 
-				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, T(1), T(0) }.normalize(); 
+				dir_vec = m_CTWMatrix*Vec<T>{ dir_x, dir_y, -T(1), T(0) }.normalize(); // Must be -T(1) 
 				m_Rays[i*m_Width + j] = Ray<T>{ m_Origin, dir_vec }; 
 				m_Rays[i*m_Width + j].pc = {T(j), T(i), T(0), T(0)}; 
 			} 
@@ -128,19 +126,6 @@ public:
 	{ 
 		return { m_Width, m_Height }; 
 	}
-
-	// Function return a single Ray 
-	// const Ray<T>& get_next_ray() const 
-	// { 
-	// 	if (m_HasRays) 
-	// 	{ 
-	// 		m_CurrentRay = (m_CurrentRay + 1) % m_Rays.size(); 
-
-	// 		return m_Rays[m_CurrentRay]; 
-	// 	} 
-
-	// 	return Ray<T>{}; 
-	// } 
 
 	// Function to return a whole array of Rays 
 	const std::vector< Ray<T> >& get_rays() const noexcept 
