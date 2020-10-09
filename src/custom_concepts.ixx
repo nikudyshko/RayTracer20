@@ -10,8 +10,8 @@ import std.core;
 export template<typename T, typename U> 
 concept castable = requires (T t, U u) 
 { 
-    { T(u) } -> T; 
-    { U(t) } -> U; 
+    { T(u) } -> std::same_as<T>; 
+    { U(t) } -> std::same_as<U>; 
 }; 
 
 // Concept to ensure possibility of basic math between two types 
@@ -32,14 +32,14 @@ concept mut_arithm = requires (T t, U u)
 export template<typename T> 
 concept sim_arithm = requires (T a, T b) 
 { 
-    { a++ }   -> T; 
-    { ++a }   -> T; 
-    { a-- }   -> T; 
-    { --a }   -> T; 
-    { a + b } -> T; 
-    { a - b } -> T; 
-    { a * b } -> T; 
-    { a / b } -> T; 
+    { a++ }; 
+    { ++a }; 
+    { a-- }; 
+    { --a }; 
+    { a + b }; 
+    { a - b }; 
+    { a * b }; 
+    { a / b }; 
 }; 
 
 // Concept to ensure applicability of complex math function to type 
