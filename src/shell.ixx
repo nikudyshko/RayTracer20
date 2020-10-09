@@ -12,6 +12,7 @@ import ray;
 import light; 
 import material; 
 import surface; 
+import hitnode; 
 
 // Structure to implement a shell. Shell represents 
 // a basic object - has surface (array of Surface's), 
@@ -60,8 +61,16 @@ public:
 	size_t get_shell_id() const noexcept 
 	{ return m_ShellID; } 
 
-	// Function to set optical properties 
-	void set_opt_prop(const OpticalBulk<T>& bulk_opt) { m_BulkOpt = OpticalBulk<T>(bulk_opt); } 
+	// Function sets optical properties 
+	inline 
+	void set_opt_prop(const OpticalBulk<T> &bulk_opt) 
+	{ m_BulkOpt = bulk_opt; } 
+
+	// Function returns optical properties 
+	inline 
+	const OpticalBulk<T>& get_opt_prop() const 
+	{ return m_BulkOpt; } 
+
 	// Function to add a single Surface to mesh 
 	void add_surface(Surface<T> surf) 
 	{ 
@@ -120,7 +129,7 @@ public:
 		Vec<T> center_point{}; 
 		for (Surface<T>& s : m_Mesh) 
 		{ 
-			std::vector< Vec<T> > ps = s.get_polygon().get_coords(); 
+			std::vector< Vec<T> > ps = s.get_geometry()->get_coords(); 
 
 			for (Vec<T>& p : ps) 
 				center_point += p; 
@@ -132,7 +141,7 @@ public:
 		T dist = T{}; 
 		for (Surface<T>& s : m_Mesh) 
 		{ 
-			std::vector< Vec<T> > ps = s.get_polygon().get_coords(); 
+			std::vector< Vec<T> > ps = s.get_geometry()->get_coords(); 
 
 			for (Vec<T>& p : ps) 
 			{ 
@@ -151,17 +160,16 @@ public:
 	bool hit_sphere(const Ray<T>& ray) const 
 	{ 
 		assert(m_HasBoundSphere); 
-		Vec<T> L = m_BoundOrigin - ray.origin; 
+		Vec<T> L = ray.origin - m_BoundOrigin;  
 
-		T a = ray.dir*ray.dir; 
 		T b = T(2)*ray.dir*L; 
 		T c = L*L - m_BoundRadius*m_BoundRadius; 
 
-		if (T d = b*b - T(4)*a*c; d > T(0)) 
+		if (T d = b*b - T(4)*c; d >= T(0)) 
 		{ 
 			T sd = std::sqrt(d); 
-			T t1 = (-b - sd)/(2*a); 
-			T t2 = (-b + sd)/(2*a); 
+			T t1 = (-b - sd)/T(2); 
+			T t2 = (-b + sd)/T(2); 
 
 			if ((t1 >= T(0)) || (t2 >= T(0))) 
 				return true; 
@@ -171,24 +179,34 @@ public:
 	} 
 
 	// Traces the path of Ray 
-	bool path_trace(size_t depth, Ray<T>& r) 
+	std::unique_ptr<HitNode<T>> path_trace(Ray<T> &r)  
 	{ 
 		assert(m_HasMesh); 
-		bool hit{false}; 
-		T sq_dist{T(0)}, sq_max_dist{r.hit_spots[depth].sq_dist}; 
+
+		T dist{std::numeric_limits<T>::max()}, min_dist{std::numeric_limits<T>::max()}; 
 		Vec<T> lx_point{}, gx_point{}; 
-		for (const Surface<T>& s : m_Mesh) 
-			if (s.get_polygon().ray_intersect(r, sq_dist, lx_point, gx_point)) 
+		std::unique_ptr<HitNode<T>> node{nullptr}; 
+
+		for (const Surface<T> &s : m_Mesh) 
+			if (s.get_geometry()->ray_intersect(r, dist, lx_point, gx_point)) 
 			{ 
-				if (sq_dist < sq_max_dist) 
+				if (dist >= T(0) && dist < min_dist) 
 				{ 
-					hit = true; 
-					sq_max_dist = sq_dist; 
-					r.hit = hit; 
-					r.hit_spots[depth] = {m_ShellID, s.get_surface_id(), sq_dist, lx_point, gx_point, s.get_polygon().get_normal(), s.get_surf_opt(lx_point)}; 
-				}
+					if (!node) 
+						node = std::make_unique<HitNode<T>>(); 
+
+					min_dist = dist;
+					node->shell_id = m_ShellID; 
+					node->surface_id = s.get_surface_id(); 
+					node->dist = min_dist; 
+					node->lx_point = lx_point; 
+					node->gx_point = gx_point; 
+					node->normal = s.get_geometry()->get_normal(gx_point); 
+					node->mat = s.get_surf_opt(lx_point); 
+				} 
 			} 
-		return hit;  
+
+		return node; 
 	} 
 
 	// Checks if the ray intersects polygons of the shell 
@@ -203,12 +221,11 @@ public:
 		assert(m_HasMesh); 
 
 		T dist{}; 
-		Vec<T> lx_temp{}, gx_temp{};
+		Vec<T> lx_temp{}, gx_temp{}; 
 
-		for (const Surface<T>& s : m_Mesh) 
+		for (const Surface<T> &s : m_Mesh) 
 		{ 
-			if (!((m_ShellID == shell_id) && (s.get_surface_id() == surface_id)) && 
-				s.get_polygon().ray_intersect(shadow_ray, dist, lx_temp, gx_temp) && 
+			if (s.get_geometry()->ray_intersect(shadow_ray, dist, lx_temp, gx_temp) && 
 				((light.position - gx_temp).sq_norm() < light_distance)) 
 				return true; 
 		} 
