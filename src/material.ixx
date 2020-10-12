@@ -4,10 +4,27 @@ export module material;
 
 import vec; 
 
+// Surface attribute: metalic or dielectric 
+enum class Conduct 
+{ 
+	METAL, 
+	DIELECTRIC 
+}; 
+
+// Type of optical calculations 
+enum class OptCalc 
+{ 
+	DIFFUSE, 
+	REFLECT, 
+	REFLECT_AND_REFRACT 
+}; 
+
 // Optical properties of surface structure 
 export template<typename T> 
 struct OpticalSurface 
 { 
+	Conduct c_type{}; 
+	OptCalc oc_type{}; 
 	// Specular exponent parameter 
 	T specular{}; 
 	// reflection - reflective properties of surface 
